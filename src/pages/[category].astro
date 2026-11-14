@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { categoryMeta, site } from '../data/site';
+import { getPublishedArticles } from '../lib/content';
+
+export function getStaticPaths() {
+  return Object.entries(categoryMeta).map(([category]) => ({
+    params: { category },
+  }));
+}
+
+const { category } = Astro.params;
+const meta = categoryMeta[category as keyof typeof categoryMeta];
+const articles = (await getPublishedArticles()).filter((article) => article.data.category === category);
+---
+
+<BaseLayout title={meta.label} description={meta.description} canonical={`${site.url}${meta.href}`}>
+  <div class="container">
+    <header class="page-header">
+      <p class="eyebrow">Category</p>
+      <h1>{meta.label}</h1>
+      <p>{meta.description}</p>
+    </header>
+
+    {
+      articles.length > 0 ? (
+        <section class="article-grid" aria-label={`${meta.label} articles`}>
+          {articles.map((article) => (
+            <ArticleCard article={article} />
+          ))}
+        </section>
+      ) : (
+        <div class="empty-state">
+          <h2>New coverage coming soon</h2>
+          <p>
+            Prismbyte is currently preparing the first articles for this topic. Check back soon for fresh
+            software guidance, product notes, and practical workflows.
+          </p>
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

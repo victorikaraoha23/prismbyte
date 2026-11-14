@@ -1,11 +1,126 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+import { categoryMeta, site } from '../data/site';
+import { getPublishedArticles } from '../lib/content';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const articles = await getPublishedArticles();
+const featured = articles[0];
+const latest = articles.slice(0, 3);
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout title="Prismbyte" description={site.description} canonical={site.url}>
+  <div class="container">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="hero__eyebrow">Independent software education</p>
+        <h1 id="hero-title">Clear choices. Smarter software. Better business.</h1>
+        <p class="lead">
+          Prismbyte helps solo founders and small online businesses discover practical AI, SaaS, and automation
+          decisions without the noise. We focus on useful software, credible guidance, and smarter operating systems.
+        </p>
+        <div class="hero-actions">
+          <a class="button button--primary" href="/blog/">Read the blog</a>
+          <a class="button button--secondary" href="/about/">Learn about Prismbyte</a>
+        </div>
+      </div>
+
+      <aside class="hero-panel" aria-label="Prismbyte content focus">
+        <h2>What we cover</h2>
+        <ul>
+          <li>AI and SaaS tools for lean teams and small businesses.</li>
+          <li>Automation playbooks for repetitive operations.</li>
+          <li>Software troubleshooting and implementation guidance.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="section" aria-labelledby="featured-heading">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Featured</p>
+          <h2 id="featured-heading">Newest insight</h2>
+        </div>
+        <a href="/blog/">Browse all articles</a>
+      </div>
+
+      {
+        featured ? (
+          <div class="featured-grid">
+            <article class="featured-story">
+              <div class="meta">
+                <span class="tag">{categoryMeta[featured.data.category].label}</span>
+                <time datetime={new Date(featured.data.publishDate).toISOString()}>
+                  {new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(
+                    new Date(featured.data.publishDate),
+                  )}
+                </time>
+              </div>
+              <h3><a href={`/blog/${featured.id}/`}>{featured.data.title}</a></h3>
+              <p>{featured.data.description}</p>
+            </article>
+            <article class="featured-story">
+              <p class="eyebrow">Editorial focus</p>
+              <h3>Practical decisions for small teams.</h3>
+              <p>
+                We help readers compare software, simplify workflows, and make better operational decisions without blindly chasing the latest tool.
+              </p>
+            </article>
+          </div>
+        ) : (
+          <div class="empty-state">
+            <h2>No published articles yet</h2>
+            <p>
+              Prismbyte is preparing the first editorial pieces. Check back soon for practical AI, SaaS, and automation guidance.
+            </p>
+          </div>
+        )
+      }
+    </section>
+
+    <section class="section" aria-labelledby="categories-heading">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Read by theme</p>
+          <h2 id="categories-heading">Editorial categories</h2>
+        </div>
+      </div>
+
+      <div class="category-grid">
+        {Object.entries(categoryMeta).map(([key, meta]) => (
+          <article class="category-card">
+            <span class="tag">{meta.label}</span>
+            <h3><a href={meta.href}>{meta.label}</a></h3>
+            <p>{meta.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="latest-heading">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Latest</p>
+          <h2 id="latest-heading">Latest articles</h2>
+        </div>
+        <a href="/blog/">View all</a>
+      </div>
+
+      {latest.length > 0 ? (
+        <div class="article-grid">
+          {latest.map((article) => (
+            <ArticleCard article={article} />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <h2>New writing is on the way</h2>
+          <p>We are building out the first set of articles for this publication.</p>
+        </div>
+      )}
+    </section>
+
+    <NewsletterSignup />
+  </div>
+</BaseLayout>

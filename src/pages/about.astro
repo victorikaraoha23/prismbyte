@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title="About" description="Learn more about Prismbyte and the editorial mission behind the publication." canonical={`${site.url}/about/`}>
+  <div class="container">
+    <header class="page-header">
+      <p class="eyebrow">About Prismbyte</p>
+      <h1>Independent guidance for software decisions.</h1>
+    </header>
+
+    <article class="static-page">
+      <p>
+        Prismbyte exists to make software decisions clearer for solo founders and small online businesses. The publication focuses on AI, SaaS, automation, and troubleshooting topics that matter in day-to-day operations.
+      </p>
+      <p>
+        The goal is not to chase hype or recommend every new tool. Practically, Prismbyte helps readers compare options, think through trade-offs, and build better operational systems without unnecessary complexity.
+      </p>
+
+      <h2>Editorial principles</h2>
+      <ul>
+        <li>Clear, useful guidance grounded in practical business context.</li>
+        <li>Independent product education rather than generic directory-style lists.</li>
+        <li>Transparent disclosure around affiliate relationships and sponsored content.</li>
+        <li>Focus on real software problems, not inflated product marketing.</li>
+      </ul>
+    </article>
+  </div>
+</BaseLayout>

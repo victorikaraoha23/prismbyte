@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title="Affiliate disclosure" description="Prismbyte affiliate disclosure and editorial independence policy." canonical={`${site.url}/affiliate-disclosure/`}>
+  <div class="container">
+    <header class="page-header">
+      <p class="eyebrow">Disclosure</p>
+      <h1>Affiliate disclosure.</h1>
+    </header>
+
+    <article class="static-page">
+      <p>
+        Prismbyte may earn a commission when readers purchase a software product or service through a link shared on this website.
+      </p>
+      <p>
+        These commissions come at no additional cost to the reader. They help support the publication and allow us to continue producing educational content around software, AI, SaaS, and automation.
+      </p>
+      <p>
+        We will clearly mark sponsored, affiliate, or compensated placements when applicable. Our recommendations are intended to assist decision-making, not to replace independent evaluation.
+      </p>
+    </article>
+  </div>
+</BaseLayout>

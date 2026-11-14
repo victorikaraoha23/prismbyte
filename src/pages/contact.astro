@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title="Contact" description="Contact Prismbyte for editorial, partnership, or general enquiries." canonical={`${site.url}/contact/`}>
+  <div class="container">
+    <header class="page-header">
+      <p class="eyebrow">Contact</p>
+      <h1>Say hello.</h1>
+    </header>
+
+    <div class="static-page">
+      <p>
+        For editorial enquiries, partnership conversations, or general questions, contact Prismbyte at
+        <a href={`mailto:${site.email}`}>{site.email}</a>.
+      </p>
+      <p>
+        This milestone focuses on the publication foundation. Future contact workflows may evolve as the site grows.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

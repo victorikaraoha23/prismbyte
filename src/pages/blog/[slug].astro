@@ -1,0 +1,86 @@
+---
+import { render } from 'astro:content';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AffiliateDisclosure from '../../components/AffiliateDisclosure.astro';
+import { categoryMeta, site } from '../../data/site';
+import { formatDate } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles', ({ data }) => !data.draft);
+  return articles.map((article) => ({
+    params: { slug: article.id },
+  }));
+}
+
+const { slug } = Astro.params as { slug: string };
+const articles = await getCollection('articles', ({ data }) => !data.draft);
+const article = articles.find((entry) => entry.id === slug);
+
+if (!article) {
+  return Astro.redirect('/404/');
+}
+
+const { Content } = await render(article);
+const category = categoryMeta[article.data.category];
+const canonical = `${site.url}/blog/${article.id}/`;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: article.data.title,
+  description: article.data.description,
+  datePublished: article.data.publishDate,
+  dateModified: article.data.updatedDate ?? article.data.publishDate,
+  author: {
+    '@type': 'Organization',
+    name: article.data.author || 'Prismbyte Editorial',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.name,
+    url: site.url,
+  },
+  mainEntityOfPage: canonical,
+};
+---
+
+<BaseLayout title={article.data.title} description={article.data.description} canonical={canonical}>
+  <article class="container article-layout">
+    <header class="article-header">
+      <p class="eyebrow">{category.label}</p>
+      <h1>{article.data.title}</h1>
+      <p class="lede">{article.data.description}</p>
+      <div class="meta">
+        <time datetime={new Date(article.data.publishDate).toISOString()}>
+          {formatDate(article.data.publishDate)}
+        </time>
+        <span>By {article.data.author}</span>
+      </div>
+    </header>
+
+    {
+      article.data.featuredImage ? (
+        <img class="article-image" src={article.data.featuredImage} alt={article.data.title} />
+      ) : null
+    }
+
+    <div class="article-body">
+      <Content />
+    </div>
+
+    {article.data.sources?.length ? (
+      <aside class="content-callout">
+        <h3>Sources</h3>
+        <ul>
+          {article.data.sources.map((source: string) => (
+            <li><a href={source}>{source}</a></li>
+          ))}
+        </ul>
+      </aside>
+    ) : null}
+
+    {article.data.affiliateDisclosure ? <AffiliateDisclosure /> : null}
+  </article>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</BaseLayout>

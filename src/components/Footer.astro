@@ -1,0 +1,34 @@
+---
+import { legalLinks, navItems, site } from '../data/site';
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="/" aria-label="Prismbyte home">
+        <span class="brand-mark">P</span>
+        <span>Prismbyte</span>
+      </a>
+      <p>{site.description}</p>
+    </div>
+
+    <div>
+      <h3>Explore</h3>
+      <ul class="footer-list">
+        {navItems.slice(1).map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div>
+      <h3>Legal</h3>
+      <ul class="footer-list">
+        {legalLinks.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>

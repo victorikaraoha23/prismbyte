@@ -1,46 +1,77 @@
-# Astro Starter Kit: Basics
+# Prismbyte
 
-```sh
-npm create astro@latest -- --template basics
+Prismbyte is a static Astro publication foundation for AI, SaaS, automation, and troubleshooting guidance for solo founders and small online businesses.
+
+## Overview
+
+This milestone sets up the site architecture, editorial content model, SEO foundation, and static pages required for a production-minded content publication. It intentionally avoids automation workflows, affiliate tracking infrastructure, or newsletter integrations beyond a clearly marked placeholder.
+
+## Local setup
+
+```bash
+npm install
+npm run dev -- --host
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The site runs at `http://localhost:4321` by default.
 
-## 🚀 Project Structure
+## Production build
 
-Inside of your Astro project, you'll see the following folders and files:
+```bash
+npm run build
+npm run preview -- --host
+```
+
+## Cloudflare Pages deployment
+
+1. Push the repository to GitHub.
+2. In Cloudflare Pages, create a new project and connect the repository.
+3. Set the build command to `npm run build`.
+4. Set the build output directory to `dist`.
+5. Deploy the project.
+
+## Project structure
 
 ```text
-/
+.
 ├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+│   ├── favicon.svg
+│   └── robots.txt
+├── src/
+│   ├── components/
+│   ├── content/
+│   │   └── articles/
+│   ├── data/
+│   ├── layouts/
+│   ├── lib/
+│   ├── pages/
+│   └── styles/
+├── astro.config.mjs
+├── package.json
+├── README.md
+├── tsconfig.json
+└── dist/ (generated on build)
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Content model
 
-## 🧞 Commands
+Articles use Astro Content Collections and live under `src/content/articles`. Each article includes fields for title, description, publish date, category, tags, author, optional featured image, draft status, sources, and affiliate disclosure flags.
 
-All commands are run from the root of the project, from a terminal:
+## SEO and metadata
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+The site includes:
 
-## 👀 Want to learn more?
+- canonical URLs
+- Open Graph metadata and X/Twitter metadata
+- XML sitemap
+- robots.txt
+- structured organization metadata
+- article schema for blog pages
+- clean static routes with trailing slashes
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Production notes
+
+- Static output is used for Cloudflare Pages compatibility.
+- The newsletter signup preview is intentionally non-functional until Brevo integration is implemented.
+- Affiliate links are prepared structurally but no fake product partnerships have been added.
+- No analytics or automation backend is included in this milestone.

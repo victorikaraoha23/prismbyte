@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title="Terms" description="Draft terms of use for Prismbyte." canonical={`${site.url}/terms/`}>
+  <div class="container">
+    <header class="page-header">
+      <p class="eyebrow">Legal</p>
+      <h1>Terms draft.</h1>
+    </header>
+
+    <article class="static-page">
+      <p>
+        These terms outline general use of the Prismbyte website and its educational content. This is a preliminary draft and is subject to change as the publication grows.
+      </p>
+      <h2>Use of content</h2>
+      <p>
+        Prismbyte content is intended for educational and informational purposes. Readers should evaluate any software, SaaS product, or automation suggestion in the context of their own business needs and risk tolerance.
+      </p>
+      <h2>Member content and links</h2>
+      <p>
+        Prismbyte may link to third-party resources, tools, or service providers. These links do not constitute endorsements unless clearly disclosed.
+      </p>
+      <h2>Limitation of liability</h2>
+      <p>
+        Prismbyte provides educational material and should not be treated as legal, tax, accounting, or professional advice. Readers are responsible for their own decisions and any resulting implementation work.
+      </p>
+      <p>
+        For questions, contact <a href={`mailto:${site.email}`}>{site.email}</a>.
+      </p>
+    </article>
+  </div>
+</BaseLayout>

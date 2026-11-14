@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { getPublishedArticles } from '../../lib/content';
+import { site } from '../../data/site';
+
+const articles = await getPublishedArticles();
+---
+
+<BaseLayout title="Blog" description="Explore practical AI, SaaS, automation, and troubleshooting guidance from Prismbyte." canonical={`${site.url}/blog/`}>
+  <div class="container">
+    <header class="page-header">
+      <p class="eyebrow">Prismbyte blog</p>
+      <h1>Helpful software ideas and practical problem-solving.</h1>
+    </header>
+
+    {
+      articles.length > 0 ? (
+        <section class="article-grid" aria-label="Article list">
+          {articles.map((article) => (
+            <ArticleCard article={article} />
+          ))}
+        </section>
+      ) : (
+        <div class="empty-state">
+          <h2>No published articles yet</h2>
+          <p>
+            We are preparing the first editorial pieces for AI, SaaS, automation, and technical guidance.
+            New articles will appear here as they are published.
+          </p>
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout title="Page not found" description="The page you are looking for could not be found." canonical={`${site.url}/404/`}>
+  <div class="container">
+    <div class="empty-state">
+      <p class="eyebrow">404</p>
+      <h1>Page not found</h1>
+      <p>The page you are looking for is not available or may have moved.</p>
+      <p><a class="button button--primary" href="/">Return home</a></p>
+    </div>
+  </div>
+</BaseLayout>
