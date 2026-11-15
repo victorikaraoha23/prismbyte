@@ -1,3 +1,4 @@
+
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -19,6 +20,7 @@ const {
 const pageTitle = title ? `${title} | ${site.name}` : site.name;
 const canonicalUrl = canonical ?? new URL(Astro.url.pathname, site.url).toString();
 const socialImage = image ?? '/favicon.svg';
+
 const organizationJson = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -37,25 +39,70 @@ const organizationJson = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph metadata -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={`${site.url}${socialImage}`} />
+
+    <!-- Twitter metadata -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={`${site.url}${socialImage}`} />
+
+    <!-- Canonical URL and favicon -->
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
     <title>{pageTitle}</title>
-    <script type="application/ld+json" set:html={JSON.stringify(organizationJson)} />
+
+    <!-- Google Tag Manager -->
+    <script is:inline>
+      (function(w,d,s,l,i) {
+        w[l]=w[l]||[];
+        w[l].push({
+          'gtm.start':new Date().getTime(),
+          event:'gtm.js'
+        });
+        var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),
+            dl=l!='dataLayer'?'&l='+l:'';
+        j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+        f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-PBTM9VBW');
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Organization structured data -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationJson)}
+    />
   </head>
+
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-PBTM9VBW"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+        title="Google Tag Manager"
+      ></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
     <Header />
+
     <main class="page-shell">
       <slot />
     </main>
+
     <Footer />
   </body>
 </html>
