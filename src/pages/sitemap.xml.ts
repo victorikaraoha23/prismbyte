@@ -15,10 +15,18 @@ const staticRoutes = [
   '/troubleshooting/',
 ];
 
+const escapeXml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+
 export const GET: APIRoute = async () => {
   const articles = await getPublishedArticles();
-  const urls = [...staticRoutes, ...articles.map((article) => `/blog/${article.slug}/`)].map(
-    (path) => `  <url><loc>${site.url}${path}</loc></url>`,
+  const urls = [...staticRoutes, ...articles.map((article) => `/blog/${article.id}/`)].map(
+    (path) => `  <url><loc>${escapeXml(`${site.url}${path}`)}</loc></url>`,
   );
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
