@@ -17,7 +17,7 @@ const staticRoutes = [
 
 export const GET: APIRoute = async () => {
   const articles = await getPublishedArticles();
-  const urls = [...staticRoutes, ...articles.map((article) => `/blog/${article.slug}/`)].map(
+  const urls = [...staticRoutes, ...articles.map((article) => `/blog/${article.id}/`)].map(
     (path) => `  <url><loc>${site.url}${path}</loc></url>`,
   );
 
