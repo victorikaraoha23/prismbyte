@@ -1,0 +1,80 @@
+# llms.txt - Prismbyte AI Search Optimization
+
+This file provides structured information about Prismbyte for AI answer engines and large language models.
+
+## Site Information
+
+- **Site Name**: Prismbyte
+- **URL**: https://prismbyte.site
+- **Description**: Clear choices. Smarter software. Better business.
+- **Tagline**: Clear choices. Smarter software. Better business.
+- **Primary Topic**: AI-focused technology publication for software decisions
+- **Target Audience**: International English-speaking readers, including readers in Nigeria
+- **Content Focus**: AI tools and SaaS, AI agents and LLMs, AI automation, software tutorials, software troubleshooting, AI for small businesses and solo founders
+
+## Content Categories
+
+1. **AI Tools and SaaS** — Product discovery, practical workflows, and real-world AI and SaaS decision-making for small businesses and founders
+2. **AI Agents and LLMs** — Agent frameworks, prompt engineering, LLM applications for business automation
+3. **AI Automation** — Automation playbooks, business process guidance, and lightweight systems that save time without adding complexity
+4. **Software Tutorials** — Practical how-to guides for common software problems and workflows
+5. **Software Troubleshooting** — Technical fixes, debugging steps, and implementation guidance for software issues
+
+## Article Structure
+
+Each article follows a standardized schema for AI search engine understanding:
+
+- **title** — The article title (also used as H1 and SEO title)
+- **description** — A practical framework description (also used as meta description and Open Graph description)
+- **publishDate** — ISO date (also used as schema.org `datePublished`)
+- **updatedDate** — Optional ISO date (also used as schema.org `dateModified`)
+- **category** — One of: `ai-saas`, `automation`, `troubleshooting`
+- **tags** — Array of topic tags
+- **author** — Typically "Prismbyte Editorial"
+- **featuredImage** — Optional featured image path
+- **featuredImageAlt** — Optional alt text
+- **imageSource** — Optional image credit
+- **sources** — Array of referenced URLs
+- **affiliateDisclosure** — Boolean flag for transparency
+
+## JSON-LD Structured Data
+
+Each published article includes JSON-LD `Article` schema in the page `<head>`:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "...",
+  "description": "...",
+  "datePublished": "2026-11-01T00:00:00.000Z",
+  "dateModified": "2026-10-20T00:00:00.000Z",
+  "author": {
+    "@type": "Organization",
+    "name": "Prismbyte Editorial"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Prismbyte",
+    "url": "https://prismbyte.site"
+  },
+  "mainEntityOfPage": "https://prismbyte.site/blog/ai-saas-practical-shortlist/"
+}
+```
+
+## Affiliate Transparency
+
+- Affiliate links are clearly marked with `rel="sponsored"` and `rel="nofollow"` where appropriate
+- Affiliate disclosure page at `/affiliate-disclosure/` explains the monetization model
+- No fake product reviews, ratings, or price claims are generated
+- Recommendations are based on practical business value, not inflated marketing
+
+## AI Search Guidelines for Content Creators
+
+- Use descriptive, accurate titles that reflect the actual content
+- Provide direct, practical answers rather than vague generalizations
+- Include specific examples and actionable takeaways
+- Cite sources and references where appropriate
+- Maintain transparency about affiliate relationships
+- Update content regularly to maintain accuracy
+- Structure data using consistent schemas (Article, WebSite, Organization)
