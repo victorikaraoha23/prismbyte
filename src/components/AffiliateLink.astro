@@ -1,0 +1,27 @@
+---
+interface Props {
+  slug: string;
+  children: string;
+  class?: string;
+}
+
+import { getActiveAffiliateLink } from '../data/affiliates';
+
+const { slug, children, class: className } = Astro.props;
+
+const link = getActiveAffiliateLink(slug);
+
+if (!link) {
+  return null;
+}
+---
+
+<a
+  href={`/go/${slug}`}
+  data-affiliate-link="true"
+  data-product-name={link.name}
+  rel="nofollow sponsored"
+  class={className}
+>
+  {children}
+</a>
