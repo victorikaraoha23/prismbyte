@@ -25,9 +25,17 @@ const escapeXml = (value: string) =>
 
 export const GET: APIRoute = async () => {
   const articles = await getPublishedArticles();
-  const urls = [...staticRoutes, ...articles.map((article) => `/blog/${article.id}/`)].map(
-    (path) => `  <url><loc>${escapeXml(`${site.url}${path}`)}</loc></url>`,
-  );
+  const articleUrls = articles.map((article) => {
+  const lastmod = article.data.updatedDate ?? article.data.publishDate;
+  const lastmodStr = new Date(lastmod).toISOString().split('T')[0];
+  return `  <url><loc>${escapeXml(`${site.url}/blog/${article.id}/`)}</loc><lastmod>${lastmodStr}</lastmod></url>`;
+});
+
+const staticUrls = staticRoutes.map(
+  (path) => `  <url><loc>${escapeXml(`${site.url}${path}`)}</loc></url>`,
+);
+
+const urls = [...staticUrls, ...articleUrls];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
