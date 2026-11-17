@@ -1,13 +1,12 @@
 ---
 interface Props {
   slug: string;
-  children: string;
   class?: string;
 }
 
 import { getActiveAffiliateLink } from '../data/affiliates';
 
-const { slug, children, class: className } = Astro.props;
+const { slug, class: className } = Astro.props;
 
 const link = getActiveAffiliateLink(slug);
 
@@ -23,5 +22,5 @@ if (!link) {
   rel="nofollow sponsored"
   class={className}
 >
-  {children}
+  <slot />
 </a>
