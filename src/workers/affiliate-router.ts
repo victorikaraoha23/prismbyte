@@ -1,4 +1,4 @@
-import { getActiveAffiliateLink } from '../data/affiliates';
+import { getActiveAffiliateLink } from '../data/affiliates.ts';
 
 interface Env {
   ASSETS: { fetch: (request: Request) => Promise<Response> };
