@@ -1,4 +1,4 @@
-import { test, describe } from 'node:test';
+import { test, describe, afterEach } from 'node:test';
 import assert from 'node:assert';
 import {
   getActiveAffiliateLink,
@@ -238,5 +238,201 @@ describe('AffiliateLink worker redirect logic', () => {
     assert.equal(res.status, 200);
     const text = await res.text();
     assert.equal(text, 'css content');
+  });
+});
+
+describe('Newsletter signup logic', () => {
+  const originalFetch = globalThis.fetch;
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  test('GET request to /api/newsletter returns 405', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+    };
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'GET',
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 405);
+  });
+
+  test('Missing BREVO_API_KEY returns 500', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+    };
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com' }),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 500);
+  });
+
+  test('Missing email field returns 400', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 400);
+  });
+
+  test('Invalid email returns 400', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'not-an-email' }),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 400);
+  });
+
+  test('Malformed JSON body returns 400', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: 'not-json',
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 400);
+  });
+
+  test('Valid email with Brevo success returns 200', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    globalThis.fetch = async () => new Response('', { status: 200 });
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com' }),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 200);
+  });
+
+  test('Brevo API error returns 502', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    globalThis.fetch = async () => new Response('', { status: 500 });
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com' }),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 502);
+  });
+
+  test('Duplicate subscription (Brevo 400) returns 409', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    globalThis.fetch = async () => new Response('', { status: 400 });
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com' }),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 409);
+  });
+
+  test('Successful subscription response body contains success:true', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    globalThis.fetch = async () => new Response('', { status: 200 });
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com' }),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.equal(body.success, true);
+    assert.equal(body.email, undefined);
+  });
+
+  test('Duplicate subscription response body does not contain success:true', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    globalThis.fetch = async () => new Response('', { status: 400 });
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com' }),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 409);
+    const body = await res.json();
+    assert.equal(body.success, undefined);
+    assert.equal(body.error, 'Email address is already subscribed');
+  });
+
+  test('Failed subscription response body does not contain success:true', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+      BREVO_API_KEY: 'test-key',
+    };
+    globalThis.fetch = async () => new Response('', { status: 500 });
+    const req = new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'test@example.com' }),
+    });
+    const res = await workerModule.default.fetch(req, mockEnv);
+    assert.equal(res.status, 502);
+    const body = await res.json();
+    assert.equal(body.success, undefined);
+    assert.equal(body.error, 'Newsletter service temporarily unavailable');
   });
 });
