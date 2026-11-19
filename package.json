@@ -21,6 +21,7 @@
     "typescript": "^6.0.3"
   },
   "devDependencies": {
-    "miniflare": "^4.20260730.0"
+    "miniflare": "^4.20260730.0",
+    "wrangler": "^4.165.0"
   }
 }
