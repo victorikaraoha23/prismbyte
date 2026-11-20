@@ -325,6 +325,65 @@ describe('Newsletter signup logic', () => {
     assert.equal(res.status, 400);
   });
 
+  test('Email containing an apostrophe is forwarded intact with list and update settings', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const email = "o'connor@example.com";
+    let calls = 0;
+    globalThis.fetch = async (_input, init) => {
+      calls++;
+      assert.deepEqual(JSON.parse(init?.body as string), {
+        email, listIds: [42], updateEnabled: true,
+      });
+      return new Response(null, { status: 204 });
+    };
+    const res = await workerModule.default.fetch(new Request('https://prismbyte.site/api/newsletter', {
+      method: 'POST', body: JSON.stringify({ email }),
+    }), {
+      ASSETS: { fetch: async () => new Response('asset') },
+      BREVO_API_KEY: 'test-key', BREVO_LIST_ID: '42',
+    });
+    assert.equal(res.status, 200);
+    assert.equal(calls, 1);
+  });
+
+  for (const body of [
+    { backup_email: 'test@example.com' },
+    { email: 'test@example.com trailing' },
+    { email: 123 }, null, [], 'test@example.com',
+  ]) {
+    test(`Rejects invalid newsletter body ${JSON.stringify(body)} without calling Brevo`, async () => {
+      const workerModule = await import('../src/workers/affiliate-router.ts');
+      let calls = 0;
+      globalThis.fetch = async () => {
+        calls++;
+        return new Response(null, { status: 201 });
+      };
+      const res = await workerModule.default.fetch(new Request('https://prismbyte.site/api/newsletter', {
+        method: 'POST', body: JSON.stringify(body),
+      }), {
+        ASSETS: { fetch: async () => new Response('asset') },
+        BREVO_API_KEY: 'test-key',
+      });
+      assert.equal(res.status, 400);
+      assert.equal(calls, 0);
+    });
+  }
+
+  for (const errorBody of [JSON.stringify({ code: 'invalid_parameter' }), '{}', 'null', 'not-json']) {
+    test(`Non-duplicate Brevo 400 (${errorBody}) returns service error`, async () => {
+      const workerModule = await import('../src/workers/affiliate-router.ts');
+      globalThis.fetch = async () => new Response(errorBody, { status: 400 });
+      const res = await workerModule.default.fetch(new Request('https://prismbyte.site/api/newsletter', {
+        method: 'POST', body: JSON.stringify({ email: 'test@example.com' }),
+      }), {
+        ASSETS: { fetch: async () => new Response('asset') },
+        BREVO_API_KEY: 'test-key',
+      });
+      assert.equal(res.status, 502);
+      assert.deepEqual(await res.json(), { error: 'Newsletter service temporarily unavailable' });
+    });
+  }
+
   test('Valid email with Brevo success returns 200', async () => {
     const workerModule = await import('../src/workers/affiliate-router.ts');
     const mockEnv: any = {
@@ -367,7 +426,7 @@ describe('Newsletter signup logic', () => {
       },
       BREVO_API_KEY: 'test-key',
     };
-    globalThis.fetch = async () => new Response('', { status: 400 });
+    globalThis.fetch = async () => new Response(JSON.stringify({ code: 'duplicate_parameter' }), { status: 400 });
     const req = new Request('https://prismbyte.site/api/newsletter', {
       method: 'POST',
       body: JSON.stringify({ email: 'test@example.com' }),
@@ -404,7 +463,7 @@ describe('Newsletter signup logic', () => {
       },
       BREVO_API_KEY: 'test-key',
     };
-    globalThis.fetch = async () => new Response('', { status: 400 });
+    globalThis.fetch = async () => new Response(JSON.stringify({ code: 'duplicate_parameter' }), { status: 400 });
     const req = new Request('https://prismbyte.site/api/newsletter', {
       method: 'POST',
       body: JSON.stringify({ email: 'test@example.com' }),

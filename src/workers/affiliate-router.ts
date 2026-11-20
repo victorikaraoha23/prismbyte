@@ -38,24 +38,21 @@ async function handleNewsletter(
     );
   }
 
-  let bodyText: string;
+  let body: unknown;
   try {
-    const buffer = await request.arrayBuffer();
-    bodyText = new TextDecoder().decode(buffer);
+    body = await request.json();
   } catch {
     return jsonResponse({ error: 'Invalid request body' }, 400);
   }
 
-  // Cloudflare Workers may re-serialize JSON bodies without quotes.
-  // Handle both {"email":"..."} and {email:"..."} formats.
-  let email: string | null = null;
-  const jsonMatch = bodyText.match(/["']?email["']?\s*:\s*["']?([^"'\s,}]+)["']?/);
-  if (jsonMatch) {
-    email = jsonMatch[1];
-  }
-  if (typeof email !== 'string' || !isValidEmail(email)) {
+  if (
+    typeof body !== 'object' || body === null || Array.isArray(body) ||
+    !('email' in body) || typeof body.email !== 'string' ||
+    !isValidEmail(body.email)
+  ) {
     return jsonResponse({ error: 'A valid email address is required' }, 400);
   }
+  const email = body.email;
 
   const listIds = env.BREVO_LIST_ID ? [parseInt(env.BREVO_LIST_ID, 10)] : [];
 
@@ -70,6 +67,7 @@ async function handleNewsletter(
       body: JSON.stringify({
         email,
         listIds,
+        updateEnabled: true,
       }),
     });
 
@@ -81,7 +79,13 @@ async function handleNewsletter(
     }
 
     if (brevoResponse.status === 400) {
-      return jsonResponse({ error: 'Email address is already subscribed' }, 409);
+      const error: unknown = await brevoResponse.json();
+      if (
+        typeof error === 'object' && error !== null &&
+        'code' in error && error.code === 'duplicate_parameter'
+      ) {
+        return jsonResponse({ error: 'Email address is already subscribed' }, 409);
+      }
     }
 
     return jsonResponse(
