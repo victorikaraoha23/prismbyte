@@ -61,7 +61,7 @@ Authentication is the most common integration failure point. Before investigatin
 - **Permissions/scopes:** Does the credential have permission for the specific action (for example, creating invoices, reading orders, writing contacts)?
 - **Environment:** Are you using the correct credential for the environment (sandbox vs production)?
 
-If an API returns 401 (unauthenticated) or 403 (forbidden), check which system returned the code. A 401 or 403 from the destination API means the credential is invalid or lacks permission for that action. A 401 or 403 from a webhook receiver means the receiver rejected the incoming request — for example, because signature verification failed or the receiver’s own credential is invalid. Fix authentication first before testing anything else.
+If an API returns 401 (unauthenticated) or 403 (forbidden), check which system returned the code. A 401 or 403 from the destination API can indicate invalid credentials or insufficient permissions. Check whether an IP access policy also blocks the request from the sender’s IP address. A 401 or 403 from a webhook receiver means the receiver rejected the incoming request — for example, because signature verification failed or the receiver’s own credential is invalid.
 
 Store credentials securely. Never log API keys, commit them to version control, or share them in chat or email. Use environment variables or a secrets manager where available.
 
@@ -71,8 +71,8 @@ HTTP status codes tell you where a request succeeded or failed. Common codes inc
 
 - **200 OK:** The request succeeded.
 - **400 Bad Request:** The request was malformed or missing required data.
-- **401 Unauthenticated:** The credential is missing, invalid, or expired.
-- **403 Forbidden:** The credential is valid but lacks permission for this action.
+- **401 Unauthenticated:** The request lacks valid authentication credentials.
+- **403 Forbidden:** The server refused the request. Check permissions and access policies.
 - **404 Not Found:** The endpoint or resource does not exist.
 - **429 Too Many Requests:** You have hit a rate limit.
 - **500 Internal Server Error:** The destination server had an unexpected problem.
@@ -137,17 +137,17 @@ A small online store uses an integration to send new orders to its accounting sy
 
 The team places a test order in the store. Thirty minutes later, the order still does not appear in the accounting system. The problem is repeatable.
 
-### Step 2: Check credentials
-
-The integration handler calls the accounting API to create invoices. The store’s API key for the accounting system is present but expired six weeks ago. When the handler attempts to create an invoice, the accounting API returns 401 errors. The team generates a new key and retries. The order still does not appear in the accounting system, so credentials were part of the problem but not the whole problem.
-
-### Step 3: Inspect status codes
-
-With the corrected credential, the integration handler can authenticate with the accounting API. The accounting API now returns 422 (unprocessable entity) with a message: `email is required`. The handler was sending `customer_email`, but the accounting system expects `email`.
-
-### Step 4: Troubleshoot webhook delivery
+### Step 2: Troubleshoot webhook delivery
 
 The store platform’s webhook dashboard shows delivery as “failed” with a timeout error. The webhook endpoint URL has a typo: an extra character in the domain. Orders were never reaching the integration handler, so they could never be forwarded to the accounting API. The team corrects the URL.
+
+### Step 3: Check credentials
+
+The integration handler calls the accounting API to create invoices. The store’s API key for the accounting system is present but expired six weeks ago. After correcting the webhook URL, the team places a new test order. The webhook reaches the handler, but the accounting API returns 401 when the handler tries to create the invoice. The team generates a new key and retries. The order still does not appear in the accounting system, so credentials were part of the problem but not the whole problem.
+
+### Step 4: Inspect status codes
+
+With the corrected credential, the integration handler can authenticate with the accounting API. The accounting API now returns 422 (unprocessable entity) with a message: `email is required`. The handler was sending `customer_email`, but the accounting system expects `email`.
 
 ### Step 5: Check payload structure
 
@@ -159,11 +159,11 @@ During a bulk import of historical orders, the accounting API returns 429 (rate 
 
 ### Step 7: Logs
 
-The accounting system’s log shows `422: missing required field: email` for the failing orders. The store’s webhook log shows `timeout` before the endpoint URL was fixed. The integration handler’s log shows 401 errors from the accounting API before the credential was renewed. Correlating the timestamps confirms all three issues.
+In timestamp order, the store’s webhook log shows a `timeout` for the original test order before the URL was fixed. After the URL correction, the handler logs a 401 from the accounting API for the new test order. After the key is renewed and the team retries, the accounting API logs `422: missing required field: email` for that order.
 
 ### Resolution
 
-After correcting the API key, fixing the webhook URL, mapping `customer_email` to `email`, and slowing bulk imports, a test order appears in the accounting system within two minutes.
+After fixing the webhook URL, renewing the API key, mapping `customer_email` to `email`, and slowing bulk imports, a test order appears in the accounting system within two minutes.
 
 ### Verification
 

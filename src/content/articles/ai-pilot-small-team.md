@@ -161,11 +161,11 @@ Illustrative costs for the three-week pilot:
 
 Drafting-and-review time saved per week: 120 minutes (2 hours). Over three weeks: 120 minutes × 3 = 360 minutes = 6 hours released. At £25 per hour, the illustrative value of that released time is £150.
 
-The illustrative opportunity value (£150) minus pilot cost (£65) = £85. This is illustrative opportunity value less pilot cost, not guaranteed cash savings — time released is only money saved if the team can use it for paid work or avoid hiring additional help.
+The net opportunity value is £150 − £25 (setup) − £15 (subscription) = £110. The time saved already accounts for pilot review time, so its cost is not deducted again. The £110 is illustrative: time released is only money saved if the team can use it for paid work or avoid hiring additional help.
 
 ### E. Final decision
 
-The pilot shows clear drafting-and-review time savings (120 minutes per week), acceptable error rates that declined over time, and a total cost below the illustrative opportunity value of released time (£65 cost vs £150 value). The team decides to scale: adopt the AI tool for weekly report drafting, with continued human review, and review again after three months.
+The pilot shows clear drafting-and-review time savings (120 minutes per week), acceptable error rates that declined over time, and an illustrative net opportunity value of £110. The team decides to scale: adopt the AI tool for weekly report drafting, with continued human review, and review again after three months.
 
 ## When not to adopt an AI tool
 
