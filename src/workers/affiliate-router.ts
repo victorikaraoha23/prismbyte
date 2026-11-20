@@ -2,13 +2,117 @@ import { getActiveAffiliateLink } from '../data/affiliates.ts';
 
 interface Env {
   ASSETS: { fetch: (request: Request) => Promise<Response> };
+  BREVO_API_KEY?: string;
+  BREVO_LIST_ID?: string;
+}
+
+const BREVO_API_URL = 'https://api.brevo.com/v3/contacts';
+
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function jsonResponse(
+  data: unknown,
+  status: number,
+): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+async function handleNewsletter(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  if (request.method !== 'POST') {
+    return jsonResponse({ error: 'Method not allowed' }, 405);
+  }
+
+  if (!env.BREVO_API_KEY) {
+    return jsonResponse(
+      { error: 'Newsletter service not configured' },
+      500,
+    );
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid request body' }, 400);
+  }
+
+  if (
+    typeof body !== 'object' || body === null || Array.isArray(body) ||
+    !('email' in body) || typeof body.email !== 'string' ||
+    !isValidEmail(body.email)
+  ) {
+    return jsonResponse({ error: 'A valid email address is required' }, 400);
+  }
+  const email = body.email;
+
+  const listIds = env.BREVO_LIST_ID ? [parseInt(env.BREVO_LIST_ID, 10)] : [];
+
+  try {
+    const brevoResponse = await fetch(BREVO_API_URL, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'api-key': env.BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        email,
+        listIds,
+        updateEnabled: true,
+      }),
+    });
+
+    if (brevoResponse.ok) {
+      return jsonResponse(
+        { success: true, message: 'Subscribed successfully' },
+        200,
+      );
+    }
+
+    if (brevoResponse.status === 400) {
+      const error: unknown = await brevoResponse.json();
+      if (
+        typeof error === 'object' && error !== null &&
+        'code' in error && error.code === 'duplicate_parameter'
+      ) {
+        return jsonResponse({ error: 'Email address is already subscribed' }, 409);
+      }
+    }
+
+    return jsonResponse(
+      { error: 'Newsletter service temporarily unavailable' },
+      502,
+    );
+  } catch {
+    return jsonResponse(
+      { error: 'Newsletter service temporarily unavailable' },
+      502,
+    );
+  }
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    // Only handle /go/* paths
+    // Handle newsletter signup requests
+    if (url.pathname === '/api/newsletter') {
+      if (request.method !== 'POST') {
+        return jsonResponse({ error: 'Method not allowed' }, 405);
+      }
+      return handleNewsletter(request, env);
+    }
+
+    // Only handle /go/* paths for affiliate redirects
     if (!url.pathname.startsWith('/go/')) {
       return env.ASSETS.fetch(request);
     }

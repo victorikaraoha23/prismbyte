@@ -10,5 +10,8 @@
   "observability": {
     "enabled": true
   },
+  "vars": {
+    "BREVO_LIST_ID": "3"
+  },
   "previews": {}
 }

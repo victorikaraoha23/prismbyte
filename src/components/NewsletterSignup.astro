@@ -1,4 +1,4 @@
-<section class="newsletter" aria-label="Newsletter signup preview">
+<section class="newsletter" aria-label="Newsletter signup">
   <div>
     <p class="eyebrow">Newsletter</p>
     <h2>Sharper insight for busy operators.</h2>
@@ -11,12 +11,102 @@
     <form class="newsletter-form" aria-label="Newsletter sign-up form">
       <label>
         <span class="sr-only">Email address</span>
-        <input type="email" name="email" placeholder="you@example.com" disabled />
+        <input
+          type="email"
+          name="email"
+          id="newsletter-email"
+          placeholder="you@example.com"
+          required
+        />
       </label>
-      <button type="button" disabled>Join the list</button>
+      <button type="submit" id="newsletter-button">Join the list</button>
     </form>
-    <p class="newsletter-note">
-      Brevo integration is planned for a future milestone. No subscriber data is collected yet.
-    </p>
+
+    <p id="newsletter-message" class="newsletter-message" role="status"></p>
   </div>
 </section>
+
+<script>
+  (function () {
+    const form = document.querySelector('.newsletter-form') as HTMLFormElement | null;
+    const input = document.getElementById('newsletter-email') as HTMLInputElement | null;
+    const button = document.getElementById('newsletter-button') as HTMLButtonElement | null;
+    const message = document.getElementById('newsletter-message') as HTMLElement | null;
+
+    if (!form || !input || !button || !message) return;
+
+    let submitting = false;
+
+    function setMessage(text: string, type: string): void {
+      message!.textContent = text;
+      message!.className = 'newsletter-message ' + type;
+      message!.setAttribute('aria-live', 'polite');
+    }
+
+    function clearMessage(): void {
+      message!.textContent = '';
+      message!.className = 'newsletter-message';
+      message!.removeAttribute('aria-live');
+    }
+
+    function setLoading(loading: boolean): void {
+      submitting = loading;
+      button!.disabled = loading;
+      input!.disabled = loading;
+      button!.textContent = loading ? 'Subscribing...' : 'Join the list';
+    }
+
+    form.addEventListener('submit', async (event: Event) => {
+      event.preventDefault();
+
+      if (submitting) return;
+
+      clearMessage();
+
+      const email = input!.value.trim();
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setMessage('Please enter a valid email address.', 'error');
+        input!.focus();
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const response = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          setMessage(data.message || 'You are now subscribed.', 'success');
+          form.reset();
+
+          const dl = window as { dataLayer?: Array<Record<string, unknown>> };
+          dl.dataLayer = dl.dataLayer || [];
+
+          dl.dataLayer.push({
+            event: 'newsletter_signup',
+            page_location: window.location.href,
+            page_title: document.title,
+            page_path: window.location.pathname
+          });
+        } else if (response.status === 409) {
+          setMessage(data.error || 'This email is already subscribed.', 'error');
+        } else {
+          setMessage(data.error || 'Something went wrong. Please try again later.', 'error');
+        }
+      } catch {
+        setMessage('Unable to connect. Please check your connection and try again.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+  })();
+</script>
