@@ -3,31 +3,62 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../data/site';
 ---
 
-<BaseLayout title="Terms" description="Draft terms of use for Prismbyte." canonical={`${site.url}/terms/`}>
+<BaseLayout title="Terms of Use" description="Terms of use for Prismbyte." canonical={`${site.url}/terms/`}>
   <div class="container">
     <header class="page-header">
       <p class="eyebrow">Legal</p>
-      <h1>Terms draft.</h1>
+      <h1>Terms of Use</h1>
     </header>
 
     <article class="static-page">
+      <h2>1. Introduction</h2>
       <p>
-        These terms outline general use of the Prismbyte website and its educational content. This is a preliminary draft and is subject to change as the publication grows.
+        Welcome to Prismbyte. These terms of use govern your use of prismbyte.site ("the website"). By accessing or using the website, you agree to these terms. If you do not agree, please do not use the website.
       </p>
-      <h2>Use of content</h2>
+
+      <h2>2. Website use and permitted conduct</h2>
       <p>
-        Prismbyte content is intended for educational and informational purposes. Readers should evaluate any software, SaaS product, or automation suggestion in the context of their own business needs and risk tolerance.
+        You may use the website for lawful purposes only. You agree not to use the website for any unlawful, harmful, or fraudulent activity, or in any way that could damage, disable, overburden, or impair the website.
       </p>
-      <h2>Member content and links</h2>
+
+      <h2>3. Educational and informational content</h2>
       <p>
-        Prismbyte may link to third-party resources, tools, or service providers. These links do not constitute endorsements unless clearly disclosed.
+        The content on this website is provided for general educational and informational purposes only. It is not intended as professional advice. Prismbyte does not provide legal, tax, accounting, or financial advice. You should consult with a qualified professional for advice tailored to your specific situation.
       </p>
-      <h2>Limitation of liability</h2>
+
+      <h2>4. Affiliate links and commissions</h2>
       <p>
-        Prismbyte provides educational material and should not be treated as legal, tax, accounting, or professional advice. Readers are responsible for their own decisions and any resulting implementation work.
+        Some links on this website may be affiliate links. If you click an affiliate link and make a purchase, Prismbyte may earn a commission at no additional cost to you. Commissions help support the publication and allow us to continue producing educational content. For more information, see our <a href="/affiliate-disclosure/">Affiliate disclosure</a> page.
       </p>
+
+      <h2>5. Third-party websites, products and services</h2>
       <p>
-        For questions, contact <a href={`mailto:${site.email}`}>{site.email}</a>.
+        This website may contain links to third-party websites, products, or services. Those websites are operated independently of Prismbyte. We do not control their content, privacy practices, or availability. Please review the terms and privacy policies of any third-party website you visit. We do not endorse or guarantee any third-party product or service.
+      </p>
+
+      <h2>6. Intellectual property</h2>
+      <p>
+        All content on this website, including text, images, logos, and design, is owned by Prismbyte or its licensors and is protected by copyright and other intellectual property laws. You may view and print pages for personal, non-commercial use only. You may not reproduce, distribute, or modify content without our written permission.
+      </p>
+
+      <h2>7. Disclaimer of warranties</h2>
+      <p>
+        The website and its content are provided on an "as is" and "as available" basis, without warranties of any kind, either express or implied. Prismbyte does not warrant that the website will be uninterrupted or error-free, that the content is accurate or complete, or that the website or its server is free of viruses or other harmful components.
+      </p>
+
+      <h2>8. Limitation of liability</h2>
+      <p>
+        To the fullest extent permitted by law, Prismbyte shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of the website or its content. Prismbyte's total liability for any claim arising out of or related to these terms shall not exceed the amount you paid, if any, for access to the website.
+      </p>
+
+      <h2>9. Changes to the website and these terms</h2>
+      <p>
+        Prismbyte may modify or discontinue the website, or any part of it, at any time without notice. We may also revise these terms at any time. Your continued use of the website after changes are posted constitutes acceptance of the revised terms.
+      </p>
+
+      <h2>10. Contact information</h2>
+      <p>
+        For questions about these terms of use, contact us at <a href={`mailto:${site.email}`}>{site.email}</a>.
       </p>
     </article>
   </div>
