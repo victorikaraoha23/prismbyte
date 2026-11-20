@@ -13,6 +13,8 @@ export async function getStaticPaths() {
   }));
 }
 
+// No prerender override - uses Astro's default static prerendering
+
 const { slug } = Astro.params as { slug: string };
 const articles = await getCollection('articles', ({ data }) => !data.draft);
 const article = articles.find((entry) => entry.id === slug);
@@ -42,6 +44,10 @@ const jsonLd = {
   },
   mainEntityOfPage: canonical,
 };
+
+const relatedArticles = articles
+  .filter((entry) => entry.id !== article.id && entry.data.category === article.data.category)
+  .slice(0, 3);
 ---
 
 <BaseLayout title={article.data.title} description={article.data.description} canonical={canonical}>
@@ -80,6 +86,17 @@ const jsonLd = {
     ) : null}
 
     {article.data.affiliateDisclosure ? <AffiliateDisclosure /> : null}
+
+    {relatedArticles.length > 0 ? (
+      <aside class="content-callout">
+        <h3>Related reading</h3>
+        <ul>
+          {relatedArticles.map((related) => (
+            <li><a href={`/blog/${related.id}/`}>{related.data.title}</a></li>
+          ))}
+        </ul>
+      </aside>
+    ) : null}
   </article>
 
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
