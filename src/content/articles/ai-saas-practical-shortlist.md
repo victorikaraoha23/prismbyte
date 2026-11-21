@@ -45,7 +45,7 @@ For adoption, weigh training and process-change costs against the expected time 
 
 For cost, estimate the time saved over the first 60 to 90 days and compare it with the subscription cost, including any coordination overhead created by adopting a new tool.
 
-The [Atlassian](https://www.atlassian.com/work-management) team has covered how tooling decisions should follow team process rather than the reverse.
+The [Atlassian](https://www.atlassian.com/work-management) team has covered how tooling decisions should follow team process rather than the reverse. Once tools are adopted, keeping integrations running smoothly is its own challenge—our guide on [how to troubleshoot API integrations](/blog/troubleshoot-api-integrations/) walks through diagnosing and fixing common integration problems.
 
 ## Keep adoption simple
 
@@ -58,7 +58,7 @@ A simple, sustainable adoption process:
 3. Review how well the tool fits the workflow.
 4. Decide whether to keep, change, or discontinue it.
 
-For example, a small team handling customer follow-ups manually might test a writing assistant on one type of follow-up, such as onboarding messages for a single new customer, review the drafts, and only then decide how far to take the tool.
+For example, a small team handling customer follow-ups manually might test a writing assistant on one type of follow-up, such as onboarding messages for a single new customer, review the drafts, and only then decide how far to take the tool. Our guide on [how to run a small AI tool pilot before rolling it out](/blog/ai-pilot-small-team/) walks through this kind of careful, small-scale trial in detail.
 
 Before adopting further, teams can review what is worth automating in the first place with our [automation checklist for lean teams](/blog/automation-checklist-for-lean-team/).
 

@@ -67,7 +67,7 @@ A practical approach for small teams:
 5. Check results and failure handling.
 6. Monitor the workflow after implementation.
 
-For example, a small team handling routine customer notifications could document the sending steps, identify the routine message as the repetitive task, choose that task, test with a small controlled example, check results and failure handling, and then monitor performance.
+For example, a small team handling routine customer notifications could document the sending steps, identify the routine message as the repetitive task, choose that task, test with a small controlled example, check results and failure handling, and then monitor performance. For teams ready to move from checklist to implementation, our guide on [how to automate a workflow end to end](/blog/workflow-automation-end-to-end/) covers mapping, building, testing, launching, and monitoring an automated workflow.
 
 ## Avoid common automation mistakes
 
