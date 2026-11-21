@@ -45,6 +45,31 @@ const jsonLd = {
   mainEntityOfPage: canonical,
 };
 
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: site.url,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: category.label,
+      item: `${site.url}${category.href}`,
+    },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: article.data.title,
+      item: canonical,
+    },
+  ],
+};
+
 const relatedArticles = articles
   .filter((entry) => entry.id !== article.id && entry.data.category === article.data.category)
   .slice(0, 3);
@@ -53,6 +78,13 @@ const relatedArticles = articles
 <BaseLayout title={article.data.title} description={article.data.description} canonical={canonical}>
   <article class="container article-layout">
     <header class="article-header">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href={category.href}>{category.label}</a></li>
+          <li class="breadcrumb-item" aria-current="page">{article.data.title}</li>
+        </ol>
+      </nav>
       <p class="eyebrow">{category.label}</p>
       <h1>{article.data.title}</h1>
       <p class="lede">{article.data.description}</p>
@@ -100,4 +132,5 @@ const relatedArticles = articles
   </article>
 
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
 </BaseLayout>
