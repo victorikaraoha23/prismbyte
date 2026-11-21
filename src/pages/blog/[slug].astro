@@ -75,7 +75,7 @@ const relatedArticles = articles
   .slice(0, 3);
 ---
 
-<BaseLayout title={article.data.title} description={article.data.description} canonical={canonical}>
+<BaseLayout title={article.data.title} description={article.data.description} canonical={canonical} publishedDate={article.data.publishDate} modifiedDate={article.data.updatedDate ?? article.data.publishDate}>
   <article class="container article-layout">
     <header class="article-header">
       <nav class="breadcrumb" aria-label="Breadcrumb">
