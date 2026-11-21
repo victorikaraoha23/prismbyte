@@ -172,13 +172,13 @@ For data safety, the pilot used controlled access and the minimum necessary cust
 Two failures occurred during the pilot. Both were simulated test events run against controlled test data; they were not actual customer transactions.
 
 1. **Delayed payment webhook:** The store platform sent the order confirmation later than usual. The order was held in pending status while awaiting payment confirmation; the workflow did not create an invoice until confirmation arrived. The delay triggered a monitoring alert after the expected window passed, but the workflow resumed safely once the webhook arrived. A delayed event still pending is not a failed action—it remains in a waiting state until confirmation or timeout.
-2. **Duplicate order submission:** A customer refreshed the checkout page, submitting the same order twice. Before creating an invoice, the workflow checked whether the order number had already been processed. The identifier and check are stored persistently so the platform can recognise repeat submissions; merely naming an idempotency key does not by itself prevent duplicates. The second submission was detected as already processed and was logged for manual review.
+2. **Duplicate order submission:** A customer refreshed the checkout page, submitting the same order twice. Every invoice creation request passed the same persistent order ID as its idempotency key. The accounting API enforced idempotency even when submissions ran concurrently, so only one invoice was created. If the API created the invoice but the workflow failed to record completion, a retry with the same key and invoice details could recover the existing invoice ID and record completion without creating another invoice. The duplicate submission was logged for manual review.
 
 Items enter the failed-item queue only after an action has failed all retry attempts. A delayed event still awaiting confirmation is not placed in the failed-item queue—it remains pending. A person is alerted when an item enters the failed-item queue or when a delayed event exceeds its timeout threshold without confirmation.
 
 ### Gradual launch
 
-After the pilot, the team launched the automation to all new orders but kept manager review for orders over £500 as a manual step. They monitored daily for the first two weeks, then weekly.
+After the pilot, the team enabled automation for a small subset of live orders and expanded to all new orders after reviewing the results. Manager review for orders over £500 remained a manual step throughout. They monitored daily for the first two weeks, then weekly.
 
 ### Monitoring and maintenance
 
