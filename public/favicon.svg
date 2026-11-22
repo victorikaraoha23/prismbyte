@@ -1,5 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Prismbyte icon">
-  <rect width="64" height="64" rx="18" fill="#0F2745"/>
-  <path d="M20 18h10.5l14 13.5-14 13.5H20l10.5-13.5L20 18Z" fill="#F6F9FF"/>
-  <path d="M34 18h10.5v28H34V18Z" fill="#8DB2F0" opacity="0.95"/>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 128 128"
+     width="128"
+     height="128"
+     role="img"
+     aria-labelledby="title desc">
+
+  <title id="title">Prismbyte Icon</title>
+  <desc id="desc">A faceted geometric prism in pink and magenta.</desc>
+
+  <defs>
+    <linearGradient id="prism-top"
+                    x1="18" y1="8" x2="108" y2="60"
+                    gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF65B0"/>
+      <stop offset="1" stop-color="#DF1377"/>
+    </linearGradient>
+
+    <linearGradient id="prism-left"
+                    x1="20" y1="34" x2="42" y2="96"
+                    gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DF1377"/>
+      <stop offset="1" stop-color="#A90959"/>
+    </linearGradient>
+
+    <linearGradient id="prism-right"
+                    x1="64" y1="60" x2="108" y2="109"
+                    gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF3B9A"/>
+      <stop offset="1" stop-color="#C20E66"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main geometric prism -->
+  <path
+    d="M20 34
+       L64 8
+       L108 34
+       L108 83
+       L64 109
+       L64 83
+       L86 70
+       L86 47
+       L64 34
+       L42 47
+       L42 96
+       L20 83 Z"
+    fill="url(#prism-top)"/>
+
+  <!-- Left face -->
+  <path
+    d="M20 34 L42 47 L42 96 L20 83 Z"
+    fill="url(#prism-left)"/>
+
+  <!-- Right face -->
+  <path
+    d="M64 83 L86 70 L86 47 L108 34 L108 83 L64 109 Z"
+    fill="url(#prism-right)"/>
+
+  <!-- Inner illuminated facet -->
+  <path
+    d="M42 47 L64 34 L86 47 L64 60 Z"
+    fill="#FFD1E7"/>
+
+  <!-- Lower inner face -->
+  <path
+    d="M42 47 L64 60 L64 83 L42 96 Z"
+    fill="#C20E66"/>
+
+  <!-- Right inner face -->
+  <path
+    d="M64 60 L86 47 L86 70 L64 83 Z"
+    fill="#F75AA7"/>
+
+  <!-- Signature floating point -->
+  <circle cx="111" cy="17" r="6" fill="#DF1377"/>
+
 </svg>
