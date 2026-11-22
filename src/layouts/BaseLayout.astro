@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import NewsletterPopup from '../components/NewsletterPopup.astro';
 import { site } from '../data/site';
 import '../styles/global.css';
 
@@ -21,6 +22,9 @@ const {
 };
 
 const pageTitle = title ? `${title} | ${site.name}` : site.name;
+
+// Theme initialization: run in <head> to prevent flash of incorrect theme.
+// Reads saved preference, falls back to system preference, then light.
 const canonicalUrl = canonical ?? new URL(Astro.url.pathname, site.url).toString();
 const socialImage = image ?? '/favicon.svg';
 
@@ -41,6 +45,30 @@ const organizationJson = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+
+    <script
+      is:inline
+      id="theme-init"
+    >(() => {
+      const STORAGE_KEY = 'prismbyte-theme';
+      const root = document.documentElement;
+      let theme;
+      try {
+        theme = localStorage.getItem(STORAGE_KEY);
+      } catch {
+        // Fall back to the system preference.
+      }
+      if (!theme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        try {
+          localStorage.setItem(STORAGE_KEY, theme);
+        } catch {
+          // Apply the theme even if it cannot be saved.
+        }
+      }
+      root.setAttribute('data-theme', theme);
+    })();
+    </script>
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
@@ -122,5 +150,7 @@ const organizationJson = {
         });
       });
     </script>
+
+    <NewsletterPopup />
   </body>
 </html>
