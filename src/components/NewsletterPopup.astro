@@ -57,7 +57,11 @@
 (() => {
   const STORAGE_KEY = 'prismbyte-newsletter-dismissed';
   const SUBSCRIBED_KEY = 'prismbyte-newsletter-subscribed';
+  const SESSION_KEY = 'prismbyte-newsletter-session-shown';
   const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+  const MIN_SHOW_DELAY = 10000;
+  const SCROLL_THRESHOLD = 0.40;
+  const AUTO_CLOSE_DELAY = 1300;
 
   const popup = document.getElementById('newsletter-popup');
   const closeBtn = document.getElementById('newsletter-popup-close');
@@ -72,6 +76,8 @@
   let shown = false;
   let previouslyFocusedElement = null;
   let focusTrapListener = null;
+  let autoCloseTimer = null;
+  let pageLoadTime = Date.now();
 
   function isDismissed() {
     try {
@@ -92,6 +98,22 @@
     }
   }
 
+  function isSessionShown() {
+    try {
+      return sessionStorage.getItem(SESSION_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  function markSessionShown() {
+    try {
+      sessionStorage.setItem(SESSION_KEY, '1');
+    } catch {
+      // fail silently
+    }
+  }
+
   function setMessage(text, type) {
     message.textContent = text;
     message.className = 'newsletter-message ' + type;
@@ -109,6 +131,21 @@
     button.disabled = loading;
     input.disabled = loading;
     button.textContent = loading ? 'Subscribing...' : 'Get Practical AI Tips';
+  }
+
+  function cancelAutoClose() {
+    if (autoCloseTimer) {
+      clearTimeout(autoCloseTimer);
+      autoCloseTimer = null;
+    }
+  }
+
+  function scheduleAutoClose() {
+    cancelAutoClose();
+    autoCloseTimer = setTimeout(() => {
+      closePopup();
+      autoCloseTimer = null;
+    }, AUTO_CLOSE_DELAY);
   }
 
   function getFocusableElements() {
@@ -146,19 +183,16 @@
     const last = focusable[focusable.length - 1];
     const active = document.activeElement;
 
-    // If focus escaped the dialog, bring it back inside
     if (!popup.contains(active)) {
       event.preventDefault();
       first.focus({ preventScroll: true });
       return;
     }
 
-    // Tab forward from last element wraps to first
     if (!event.shiftKey && active === last) {
       event.preventDefault();
       first.focus({ preventScroll: true });
     }
-    // Shift+Tab from first element wraps to last
     if (event.shiftKey && active === first) {
       event.preventDefault();
       last.focus({ preventScroll: true });
@@ -166,21 +200,37 @@
   }
 
   function openPopup() {
-    if (shown || isDismissed() || isSubscribed() || submitting) return;
+    if (shown || isDismissed() || isSubscribed() || isSessionShown() || submitting) return;
+    if (Date.now() - pageLoadTime < MIN_SHOW_DELAY) return;
+
     previouslyFocusedElement = document.activeElement;
     popup.removeAttribute('hidden');
     popup.setAttribute('aria-modal', 'true');
     input.focus({ preventScroll: true });
     shown = true;
+    markSessionShown();
 
     focusTrapListener = (event) => trapFocus(event);
     document.addEventListener('keydown', focusTrapListener);
+
+    try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'newsletter_popup_view',
+        page_location: window.location.href,
+        page_title: document.title,
+        page_path: window.location.pathname,
+      });
+    } catch {
+      // fail silently
+    }
   }
 
   function closePopup() {
     popup.setAttribute('hidden', '');
     popup.removeAttribute('aria-modal');
     shown = false;
+    cancelAutoClose();
 
     if (focusTrapListener) {
       document.removeEventListener('keydown', focusTrapListener);
@@ -195,19 +245,34 @@
     previouslyFocusedElement = null;
   }
 
+  function shouldShowByScroll() {
+    return window.scrollY > window.innerHeight * SCROLL_THRESHOLD;
+  }
+
+  function maybeShowFromScroll() {
+    if (shouldShowByScroll()) {
+      openPopup();
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
+    }
+  }
+
+  function maybeShowFromTimer() {
+    if (shouldShowByScroll()) {
+      openPopup();
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(timer);
+    }
+  }
+
+  let timer;
+  let onScroll;
+
   try {
     const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (!dismissed) {
-      const t = setTimeout(() => {
-        if (!isSubscribed()) openPopup();
-      }, 30000);
-      const onScroll = () => {
-        if (window.scrollY > window.innerHeight * 0.5) {
-          if (!isSubscribed()) openPopup();
-          window.removeEventListener('scroll', onScroll);
-          clearTimeout(t);
-        }
-      };
+    if (!dismissed && !isSubscribed()) {
+      timer = setTimeout(maybeShowFromTimer, MIN_SHOW_DELAY);
+      onScroll = () => maybeShowFromScroll();
       window.addEventListener('scroll', onScroll, { passive: true });
     }
   } catch {
@@ -216,6 +281,17 @@
 
   closeBtn.addEventListener('click', () => {
     closePopup();
+    try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'newsletter_popup_dismiss',
+        page_location: window.location.href,
+        page_title: document.title,
+        page_path: window.location.pathname,
+      });
+    } catch {
+      // fail silently
+    }
     try {
       localStorage.setItem(STORAGE_KEY, Date.now() + '|dismissed');
     } catch {
@@ -249,30 +325,33 @@
 
       if (response.ok) {
         setMessage(data.message || 'You are now subscribed.', 'success');
-        form.reset();
-        closePopup();
         try {
           localStorage.setItem(SUBSCRIBED_KEY, '1');
           localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
         } catch {
           // fail silently
         }
-        const dl = window;
-        dl.dataLayer = dl.dataLayer || [];
-        dl.dataLayer.push({
-          event: 'newsletter_signup',
-          page_location: window.location.href,
-          page_title: document.title,
-          page_path: window.location.pathname,
-        });
+        scheduleAutoClose();
+        try {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'newsletter_signup',
+            page_location: window.location.href,
+            page_title: document.title,
+            page_path: window.location.pathname,
+          });
+        } catch {
+          // fail silently
+        }
       } else if (response.status === 409) {
-        setMessage("You're already on the Prismbyte newsletter list. Thanks for being here!", 'success');
+        setMessage("You're already subscribed! Thanks for being part of Prismbyte.", 'success');
         try {
           localStorage.setItem(SUBSCRIBED_KEY, '1');
           localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
         } catch {
           // fail silently
         }
+        scheduleAutoClose();
       } else {
         setMessage(data.error || 'Something went wrong. Please try again later.', 'error');
       }
@@ -286,6 +365,17 @@
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !popup.hasAttribute('hidden')) {
       closePopup();
+      try {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'newsletter_popup_dismiss',
+          page_location: window.location.href,
+          page_title: document.title,
+          page_path: window.location.pathname,
+        });
+      } catch {
+        // fail silently
+      }
       try {
         localStorage.setItem(STORAGE_KEY, Date.now() + '|dismissed');
       } catch {

@@ -1111,7 +1111,15 @@ main {
 @media (max-width: 560px) {
   .newsletter-popup__panel {
     padding: 1.5rem;
-    width: min(90vw, 480px);
+    width: min(92vw, 480px);
+    max-height: 85vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: translateY(0);
+    animation: none;
   }
 
   .newsletter-popup .newsletter-form {
