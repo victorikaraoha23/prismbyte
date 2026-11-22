@@ -7,7 +7,7 @@ import { legalLinks, navItems, site } from '../data/site';
     <div class="footer-brand">
       <a class="brand" href="/" aria-label="Prismbyte home">
         <img class="brand-logo brand-logo--desktop" id="logo-desktop-footer" src="/prismbyte-logo.svg" alt="" width="320" height="80" />
-        <img class="brand-logo brand-logo--mobile" id="logo-mobile-footer" src="/prismbyte-icon.svg" alt="" width="48" height="48" />
+        <img class="brand-logo brand-logo--mobile" id="logo-mobile-footer" src="/prismbyte-logo.svg" alt="" width="320" height="80" />
       </a>
       <p>{site.description}</p>
     </div>
@@ -17,10 +17,12 @@ import { legalLinks, navItems, site } from '../data/site';
         const STORAGE_KEY = 'prismbyte-theme';
         const root = document.documentElement;
         const logoDesktop = document.getElementById('logo-desktop-footer');
+        const logoMobile = document.getElementById('logo-mobile-footer');
 
         function setThemeLogo() {
           const theme = root.getAttribute('data-theme') || 'light';
           logoDesktop.src = theme === 'dark' ? '/prismbyte-logo-dark.svg' : '/prismbyte-logo.svg';
+          logoMobile.src = theme === 'dark' ? '/prismbyte-logo-dark.svg' : '/prismbyte-logo.svg';
         }
 
         setThemeLogo();

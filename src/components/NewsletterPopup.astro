@@ -24,10 +24,10 @@
 
     <div class="newsletter-popup__content">
       <h2 id="newsletter-popup-title" class="newsletter-popup__title">
-        Sharper insight for busy operators.
+        Make AI Work Smarter for You
       </h2>
       <p id="newsletter-popup-desc" class="newsletter-popup__desc">
-        A brief, useful email for product decisions, workflow improvements, and practical software guidance.
+        Get practical AI tips, useful AI tool recommendations, automation ideas and straightforward guides to help you save time and work smarter. No hype—just useful insights you can put into action.
       </p>
 
       <form class="newsletter-form" aria-label="Newsletter sign-up form">
@@ -37,14 +37,16 @@
             type="email"
             name="email"
             id="newsletter-popup-email"
-            placeholder="you@example.com"
+            placeholder="Enter your email address"
             required
           />
         </label>
         <button type="submit" id="newsletter-popup-button" class="button button--primary">
-          Join the list
+          Get Practical AI Tips
         </button>
       </form>
+
+      <p class="newsletter-popup__privacy">Useful insights only. Unsubscribe whenever you want.</p>
 
       <p id="newsletter-popup-message" class="newsletter-message" role="status"></p>
     </div>
@@ -106,7 +108,7 @@
     submitting = loading;
     button.disabled = loading;
     input.disabled = loading;
-    button.textContent = loading ? 'Subscribing...' : 'Join the list';
+    button.textContent = loading ? 'Subscribing...' : 'Get Practical AI Tips';
   }
 
   function getFocusableElements() {
@@ -264,7 +266,13 @@
           page_path: window.location.pathname,
         });
       } else if (response.status === 409) {
-        setMessage(data.error || 'This email is already subscribed.', 'error');
+        setMessage("You're already on the Prismbyte newsletter list. Thanks for being here!", 'success');
+        try {
+          localStorage.setItem(SUBSCRIBED_KEY, '1');
+          localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
+        } catch {
+          // fail silently
+        }
       } else {
         setMessage(data.error || 'Something went wrong. Please try again later.', 'error');
       }
