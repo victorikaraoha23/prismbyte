@@ -2,6 +2,7 @@
   --color-primary: #DF1377;
   --color-primary-hover: #C20E66;
   --color-primary-soft: #F9D5E5;
+  --color-primary-text: #A90C58;
   --color-on-primary: #FFFFFF;
 
   --color-bg: #F7F6F2;
@@ -26,6 +27,7 @@
   --color-primary: #FF3B9A;
   --color-primary-hover: #FF5CA9;
   --color-primary-soft: #4A152F;
+  --color-primary-text: #FF5CA9;
   --color-on-primary: #121210;
 
   --color-bg: #121210;
@@ -53,7 +55,7 @@ body {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
@@ -65,7 +67,7 @@ a:hover {
 }
 
 article a {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -84,7 +86,6 @@ a[href^="http"]:not([href*="prismbyte.site"])::after {
   font-size: 0.75em;
   position: relative;
   top: -0.05em;
-  opacity: 0.6;
 }
 
 /* Affiliate link identification */
@@ -98,8 +99,6 @@ a[data-affiliate-link="true"]::after {
   position: relative;
   top: -0.3em;
   margin-left: 0.2em;
-  color: var(--color-primary);
-  opacity: 0.8;
 }
 
 /* Visible focus indicators for keyboard navigation */
@@ -140,7 +139,7 @@ main {
   top: 0;
   z-index: 10;
   backdrop-filter: blur(12px);
-  background: rgba(247, 246, 242, 0.82);
+  background: color-mix(in srgb, var(--color-bg) 82%, transparent);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -169,7 +168,7 @@ main {
   height: 2.3rem;
   border-radius: 0.8rem;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-  color: white;
+  color: var(--color-on-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -197,7 +196,7 @@ main {
 .site-nav a:hover,
 .site-nav a:focus-visible {
   background: var(--color-primary-soft);
-  color: var(--color-primary-hover);
+  color: var(--color-primary-text);
 }
 
 .page-shell {
@@ -220,7 +219,7 @@ main {
 .hero__eyebrow,
 .eyebrow {
   margin-bottom: 0.75rem;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   text-transform: uppercase;
   letter-spacing: 0.09em;
   font-size: 0.78rem;
@@ -280,6 +279,7 @@ main {
 .button--primary:hover,
 .button--primary:focus-visible {
   background: var(--color-primary-hover);
+  color: var(--color-on-primary);
   border-color: var(--color-primary-hover);
 }
 
@@ -325,7 +325,7 @@ main {
 
 .hero-panel li::before {
   content: '•';
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-size: 1.7rem;
   line-height: 1;
 }
@@ -349,7 +349,6 @@ main {
 }
 
 .section-header a {
-  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -442,7 +441,7 @@ main {
   padding: 0.35rem 0.6rem;
   border-radius: 999px;
   background: var(--color-primary-soft);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -459,10 +458,8 @@ main {
   font-size: 1.55rem;
 }
 
-.article-card a:hover,
-.category-card a:hover,
-.featured-story a:hover {
-  color: var(--color-primary);
+:is(.article-card, .category-card, .featured-story) a:hover:not(:where(.button--primary)) {
+  color: var(--color-primary-text);
 }
 
 .newsletter {
@@ -508,7 +505,7 @@ main {
   border: none;
   border-radius: 999px;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-on-primary);
   padding: 0.8rem 1rem;
   font: inherit;
   font-weight: 700;
@@ -658,7 +655,7 @@ main {
   clip: auto;
   white-space: normal;
   background: var(--color-primary);
-  color: white;
+  color: var(--color-on-primary);
   text-decoration: underline;
   border-radius: var(--radius-sm);
   z-index: 1000;
