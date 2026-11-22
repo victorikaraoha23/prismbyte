@@ -37,6 +37,9 @@
 
     let submitting = false;
 
+    const STORAGE_KEY = 'prismbyte-newsletter-dismissed';
+    const SUBSCRIBED_KEY = 'prismbyte-newsletter-subscribed';
+
     function setMessage(text: string, type: string): void {
       message!.textContent = text;
       message!.className = 'newsletter-message ' + type;
@@ -88,6 +91,13 @@
           setMessage(data.message || 'You are now subscribed.', 'success');
           form.reset();
 
+          try {
+            localStorage.setItem(SUBSCRIBED_KEY, '1');
+            localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
+          } catch {
+            // fail silently
+          }
+
           const dl = window as { dataLayer?: Array<Record<string, unknown>> };
           dl.dataLayer = dl.dataLayer || [];
 
@@ -98,7 +108,14 @@
             page_path: window.location.pathname
           });
         } else if (response.status === 409) {
-          setMessage(data.error || 'This email is already subscribed.', 'error');
+          setMessage("You're already subscribed! Thanks for being part of Prismbyte.", 'success');
+
+          try {
+            localStorage.setItem(SUBSCRIBED_KEY, '1');
+            localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
+          } catch {
+            // fail silently
+          }
         } else {
           setMessage(data.error || 'Something went wrong. Please try again later.', 'error');
         }

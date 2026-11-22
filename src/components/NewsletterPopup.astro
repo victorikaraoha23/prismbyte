@@ -87,7 +87,7 @@
       return Date.now() - parseInt(ts, 10) < SEVEN_DAYS;
     } catch {
       // Suppress the popup when dismissal storage is unavailable.
-      return true;
+      return false;
     }
   }
 
