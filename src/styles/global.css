@@ -30,8 +30,6 @@
   --grid-minor-color: rgba(22, 22, 20, 0.045);
   --grid-major-color: rgba(22, 22, 20, 0.09);
   --noise-opacity: 0.035;
-
-  --shadow-soft: 0 18px 42px rgba(16, 24, 40, 0.08);
 }
 
 [data-theme="dark"] {
@@ -94,14 +92,50 @@
   }
 }
 
+@media (prefers-contrast: more) {
+  :root {
+    --color-text: #000000;
+    --color-text-muted: #333333;
+    --color-border: #000000;
+    --color-primary: #000000;
+    --color-primary-hover: #000000;
+  }
+  .site-header {
+    backdrop-filter: none;
+    background: var(--color-bg);
+    border-bottom: 2px solid var(--color-border);
+  }
+  .button {
+    border-width: 2px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .site-header {
+    backdrop-filter: none;
+    background: var(--color-bg);
+  }
+}
+
+html {
+  background-color: var(--color-bg);
+}
+
 body {
   margin: 0;
-  background-color: var(--color-bg);
+  background-color: transparent;
   color: var(--color-text);
-  font-family: Inter, 'Segoe UI', sans-serif;
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
   line-height: 1.7;
   min-height: 100vh;
   position: relative;
+}
+
+/* Body copy uses a clean system sans for readability */
+.article-body, .article-body p, .article-body li, .static-page p, .static-page li,
+.page-intro, .static-page, .newsletter, .hero p.lead, .hero__eyebrow, .eyebrow,
+.section-header, .section-header h2, .featured-story, .category-card, .article-card {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Fixed Instrument Grid Layer with Edge Vignette */
@@ -134,25 +168,7 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  will-change: transform;
-  opacity: var(--noise-opacity);
-  background-image: repeating-radial-gradient(
-    circle at 0 0,
-    transparent 0,
-    rgba(128, 128, 128, 0.35) 1px,
-    transparent 2px,
-    transparent 4px
-  );
-  background-size: 6px 6px;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
   opacity: var(--noise-opacity);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
