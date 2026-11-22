@@ -80,7 +80,7 @@ a[href^="http"]:not([href*="prismbyte.site"]) {
 }
 
 a[href^="http"]:not([href*="prismbyte.site"])::after {
-  content: "\2197";
+  content: ">";
   font-size: 0.75em;
   position: relative;
   top: -0.05em;
