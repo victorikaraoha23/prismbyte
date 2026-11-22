@@ -7,8 +7,8 @@ const { pathname } = Astro.url;
 <header class="site-header">
   <div class="header-inner">
     <a class="brand" href="/" aria-label="Prismbyte home">
-      <span class="brand-mark">P</span>
-      <span>Prismbyte</span>
+      <img class="brand-logo brand-logo--desktop" id="logo-desktop" src="/prismbyte-logo.svg" alt="" width="320" height="80" />
+      <img class="brand-logo brand-logo--mobile" id="logo-mobile" src="/prismbyte-icon.svg" alt="" width="48" height="48" />
     </a>
 
     <button
@@ -57,6 +57,7 @@ const { pathname } = Astro.url;
   const toggle = document.getElementById('theme-toggle');
   const sunIcon = toggle.querySelector('.theme-toggle__icon--sun');
   const moonIcon = toggle.querySelector('.theme-toggle__icon--moon');
+  const logoDesktop = document.getElementById('logo-desktop');
 
   function setIcons(theme) {
     if (theme === 'dark') {
@@ -74,6 +75,8 @@ const { pathname } = Astro.url;
     root.setAttribute('data-theme', theme);
     localStorage.setItem(STORAGE_KEY, theme);
     setIcons(theme);
+    logoDesktop.src = theme === 'dark' ? '/prismbyte-logo-dark.svg' : '/prismbyte-logo.svg';
+    root.dispatchEvent(new CustomEvent('themechange'));
   }
 
   // Initialize icons from current theme
