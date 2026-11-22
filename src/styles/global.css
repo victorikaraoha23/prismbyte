@@ -1,4 +1,7 @@
 :root {
+  color-scheme: light;
+
+  /* Brand Accent */
   --color-primary: #DF1377;
   --color-primary-hover: #C20E66;
   --color-primary-soft: #F9D5E5;
@@ -21,15 +24,19 @@
   --radius-sm: 10px;
   --max-width: 1180px;
 
-  /* Textures: Drafting Grid & Paper Grain */
-  --grid-color: rgba(22, 22, 20, 0.045);
-  --grid-size: 24px;
+  /* Forensic Major / Minor Grid */
+  --grid-minor-size: 16px;
+  --grid-major-size: 64px;
+  --grid-minor-color: rgba(22, 22, 20, 0.045);
+  --grid-major-color: rgba(22, 22, 20, 0.09);
   --noise-opacity: 0.035;
 
   --shadow-soft: 0 18px 42px rgba(16, 24, 40, 0.08);
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
+
   --color-primary: #FF3B9A;
   --color-primary-hover: #FF5CA9;
   --color-primary-soft: #4A152F;
@@ -46,9 +53,9 @@
   --color-warning: #E59838;
   --color-error: #F25C6E;
 
-  /* Textures: Drafting Grid & Paper Grain */
-  --grid-color: rgba(244, 242, 236, 0.04);
-  --grid-size: 24px;
+  /* Forensic Major / Minor Grid */
+  --grid-minor-color: rgba(244, 242, 236, 0.055);
+  --grid-major-color: rgba(244, 242, 236, 0.11);
   --noise-opacity: 0.045;
 
   --shadow-soft: 0 18px 42px rgba(16, 24, 40, 0.08);
@@ -56,6 +63,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
+
     --color-primary: #FF3B9A;
     --color-primary-hover: #FF5CA9;
     --color-primary-soft: #4A152F;
@@ -72,9 +81,9 @@
     --color-warning: #E59838;
     --color-error: #F25C6E;
 
-    /* Textures: Drafting Grid & Paper Grain */
-    --grid-color: rgba(244, 242, 236, 0.04);
-    --grid-size: 24px;
+    /* Forensic Major / Minor Grid */
+    --grid-minor-color: rgba(244, 242, 236, 0.055);
+    --grid-major-color: rgba(244, 242, 236, 0.11);
     --noise-opacity: 0.045;
   }
 }
@@ -93,11 +102,50 @@ body {
   line-height: 1.7;
   min-height: 100vh;
   position: relative;
+}
+
+/* Fixed Instrument Grid Layer with Edge Vignette */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
-    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-  background-size: var(--grid-size) var(--grid-size);
+    /* Major 64px Grid Lines */
+    linear-gradient(to right, var(--grid-major-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-major-color) 1px, transparent 1px),
+    /* Minor 16px Sub-Grid Lines */
+    linear-gradient(to right, var(--grid-minor-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-minor-color) 1px, transparent 1px);
+  background-size:
+    var(--grid-major-size) var(--grid-major-size),
+    var(--grid-major-size) var(--grid-major-size),
+    var(--grid-minor-size) var(--grid-minor-size),
+    var(--grid-minor-size) var(--grid-minor-size);
   background-position: -1px -1px;
+  /* Soft radial mask so lines stay crisp around content and fade at viewport edges */
+  mask-image: radial-gradient(ellipse 85% 75% at 50% 35%, #000 55%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 35%, #000 55%, transparent 100%);
+}
+
+/* Paper Grain Texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  will-change: transform;
+  opacity: var(--noise-opacity);
+  background-image: repeating-radial-gradient(
+    circle at 0 0,
+    transparent 0,
+    rgba(128, 128, 128, 0.35) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  background-size: 6px 6px;
 }
 
 body::before {
