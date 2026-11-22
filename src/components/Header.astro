@@ -72,18 +72,28 @@ const { pathname } = Astro.url;
     }
   }
 
+  function setLogos(theme) {
+    const src = theme === 'dark' ? '/prismbyte-logo-dark.svg' : '/prismbyte-logo.svg';
+    logoDesktop.src = src;
+    logoMobile.src = src;
+  }
+
   function setTheme(theme) {
     root.setAttribute('data-theme', theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+    try {
+      localStorage.setItem(STORAGE_KEY, theme);
+    } catch {
+      // The current page can still switch themes.
+    }
     setIcons(theme);
-    logoDesktop.src = theme === 'dark' ? '/prismbyte-logo-dark.svg' : '/prismbyte-logo.svg';
-    logoMobile.src = theme === 'dark' ? '/prismbyte-logo-dark.svg' : '/prismbyte-logo.svg';
+    setLogos(theme);
     root.dispatchEvent(new CustomEvent('themechange'));
   }
 
-  // Initialize icons from current theme
+  // Sync the header with the theme selected in the layout.
   const currentTheme = root.getAttribute('data-theme') || 'light';
   setIcons(currentTheme);
+  setLogos(currentTheme);
 
   toggle.addEventListener('click', () => {
     const isDark = root.getAttribute('data-theme') === 'dark';
@@ -116,6 +126,7 @@ const { pathname } = Astro.url;
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && navMenu.classList.contains('site-nav--open')) {
       closeMenu();
+      menuToggle.focus();
     }
   });
 })();

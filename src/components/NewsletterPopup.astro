@@ -65,7 +65,7 @@
 
   const popup = document.getElementById('newsletter-popup');
   const closeBtn = document.getElementById('newsletter-popup-close');
-  const form = document.querySelector('.newsletter-form');
+  const form = popup?.querySelector('.newsletter-form');
   const input = document.getElementById('newsletter-popup-email');
   const button = document.getElementById('newsletter-popup-button');
   const message = document.getElementById('newsletter-popup-message');
@@ -86,7 +86,8 @@
       const [ts] = val.split('|');
       return Date.now() - parseInt(ts, 10) < SEVEN_DAYS;
     } catch {
-      return false;
+      // Suppress the popup when dismissal storage is unavailable.
+      return true;
     }
   }
 
@@ -200,8 +201,8 @@
   }
 
   function openPopup() {
-    if (shown || isDismissed() || isSubscribed() || isSessionShown() || submitting) return;
-    if (Date.now() - pageLoadTime < MIN_SHOW_DELAY) return;
+    if (shown || isDismissed() || isSubscribed() || isSessionShown() || submitting) return false;
+    if (Date.now() - pageLoadTime < MIN_SHOW_DELAY) return false;
 
     previouslyFocusedElement = document.activeElement;
     popup.removeAttribute('hidden');
@@ -224,6 +225,7 @@
     } catch {
       // fail silently
     }
+    return true;
   }
 
   function closePopup() {
@@ -249,34 +251,17 @@
     return window.scrollY > window.innerHeight * SCROLL_THRESHOLD;
   }
 
-  function maybeShowFromScroll() {
-    if (shouldShowByScroll()) {
-      openPopup();
-      window.removeEventListener('scroll', onScroll);
-      clearTimeout(timer);
-    }
-  }
-
-  function maybeShowFromTimer() {
-    if (shouldShowByScroll()) {
-      openPopup();
-      window.removeEventListener('scroll', onScroll);
+  function maybeShowPopup() {
+    if (shouldShowByScroll() && openPopup()) {
+      window.removeEventListener('scroll', maybeShowPopup);
       clearTimeout(timer);
     }
   }
 
   let timer;
-  let onScroll;
-
-  try {
-    const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (!dismissed && !isSubscribed()) {
-      timer = setTimeout(maybeShowFromTimer, MIN_SHOW_DELAY);
-      onScroll = () => maybeShowFromScroll();
-      window.addEventListener('scroll', onScroll, { passive: true });
-    }
-  } catch {
-    // localStorage unavailable — fail silently, never show popup
+  if (!isDismissed() && !isSubscribed()) {
+    timer = setTimeout(maybeShowPopup, MIN_SHOW_DELAY);
+    window.addEventListener('scroll', maybeShowPopup, { passive: true });
   }
 
   closeBtn.addEventListener('click', () => {

@@ -52,10 +52,19 @@ const organizationJson = {
     >(() => {
       const STORAGE_KEY = 'prismbyte-theme';
       const root = document.documentElement;
-      let theme = localStorage.getItem(STORAGE_KEY);
+      let theme;
+      try {
+        theme = localStorage.getItem(STORAGE_KEY);
+      } catch {
+        // Fall back to the system preference.
+      }
       if (!theme) {
         theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        localStorage.setItem(STORAGE_KEY, theme);
+        try {
+          localStorage.setItem(STORAGE_KEY, theme);
+        } catch {
+          // Apply the theme even if it cannot be saved.
+        }
       }
       root.setAttribute('data-theme', theme);
     })();

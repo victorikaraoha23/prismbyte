@@ -73,6 +73,13 @@
     --color-primary: #000000;
     --color-primary-hover: #000000;
   }
+  :root[data-theme="dark"] {
+    --color-text: #FFFFFF;
+    --color-text-muted: #D6D3CC;
+    --color-primary: #FF9DCA;
+    --color-primary-hover: #FFC2DF;
+    --color-on-primary: #121210;
+  }
   .site-header {
     backdrop-filter: none;
     background: var(--color-bg);
