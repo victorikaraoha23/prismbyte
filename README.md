@@ -1,77 +1,69 @@
 # Prismbyte
 
-Prismbyte is a static Astro publication foundation for AI, SaaS, automation, and troubleshooting guidance for solo founders and small online businesses.
+**Clear choices. Smarter software. Better business.**
 
-## Overview
+Prismbyte is an independent editorial website for solo founders and small online businesses. It publishes practical guidance on AI and SaaS tools, workflow automation, and software troubleshooting—with an emphasis on useful decisions rather than hype.
 
-This milestone sets up the site architecture, editorial content model, SEO foundation, and static pages required for a production-minded content publication. It intentionally avoids automation workflows, affiliate tracking infrastructure, or newsletter integrations beyond a clearly marked placeholder.
+- **Website:** https://prismbyte.site
+- **Status:** Live publication
+- **Repository:** https://github.com/victorikaraoha23/prismbyte
 
-## Local setup
+## Editorial focus
+
+- **AI & SaaS:** product discovery, practical workflows, and software decisions for small teams.
+- **Automation:** playbooks for reducing repetitive work without adding unnecessary operational complexity.
+- **Troubleshooting:** technical fixes, debugging guidance, and API integration help.
+
+## Site capabilities
+
+- Static, content-driven pages and article routes
+- Astro Content Collections for typed article metadata
+- Category pages, article listings, and individual article pages
+- Canonical metadata, Open Graph and X metadata, sitemap, robots.txt, and structured data
+- Affiliate disclosure and a small redirect worker for configured affiliate destinations
+- Responsive layouts and accessible navigation patterns
+- Cloudflare deployment configuration
+
+Article content lives in `src/content/articles/`. Site identity, navigation, and category metadata are defined in `src/data/site.ts`.
+
+## Technology
+
+- Astro 7
+- TypeScript
+- Cloudflare Workers with static assets
+- Astro Content Collections
+- Node.js test runner and Miniflare for worker-focused tests
+
+## Local development
+
+Requirements: Node.js version compatible with the `engines` field in `package.json`, npm.
 
 ```bash
+git clone https://github.com/victorikaraoha23/prismbyte.git
+cd prismbyte
 npm install
-npm run dev -- --host
+npm run dev
 ```
 
-The site runs at `http://localhost:4321` by default.
+Astro serves the local site at http://localhost:4321 by default.
 
-## Production build
+## Build and checks
 
 ```bash
+npm test
 npm run build
-npm run preview -- --host
+npx astro check
 ```
 
-## Cloudflare Pages deployment
+## Deployment
 
-1. Push the repository to GitHub.
-2. In Cloudflare Pages, create a new project and connect the repository.
-3. Set the build command to `npm run build`.
-4. Set the build output directory to `dist`.
-5. Deploy the project.
+The repository includes `wrangler.jsonc` for Cloudflare Workers. Review the configured account and deployment settings before publishing:
 
-## Project structure
-
-```text
-.
-├── public/
-│   ├── favicon.svg
-│   └── robots.txt
-├── src/
-│   ├── components/
-│   ├── content/
-│   │   └── articles/
-│   ├── data/
-│   ├── layouts/
-│   ├── lib/
-│   ├── pages/
-│   └── styles/
-├── astro.config.mjs
-├── package.json
-├── README.md
-├── tsconfig.json
-└── dist/ (generated on build)
+```bash
+npm run wrangler:status
+npm run wrangler:deploy
 ```
 
-## Content model
+## Project boundaries
 
-Articles use Astro Content Collections and live under `src/content/articles`. Each article includes fields for title, description, publish date, category, tags, author, optional featured image, draft status, sources, and affiliate disclosure flags.
-
-## SEO and metadata
-
-The site includes:
-
-- canonical URLs
-- Open Graph metadata and X/Twitter metadata
-- XML sitemap
-- robots.txt
-- structured organization metadata
-- article schema for blog pages
-- clean static routes with trailing slashes
-
-## Production notes
-
-- Static output is used for Cloudflare Pages compatibility.
-- The newsletter signup preview is intentionally non-functional until Brevo integration is implemented.
-- Affiliate links are prepared structurally but no fake product partnerships have been added.
-- No analytics or automation backend is included in this milestone.
+Prismbyte is an editorial publication, not a SaaS product. Affiliate components and routing are infrastructure for disclosed links; their presence does not imply an active commercial partnership. Newsletter UI and integrations should only be described as operational when a real provider integration has been configured and tested.
