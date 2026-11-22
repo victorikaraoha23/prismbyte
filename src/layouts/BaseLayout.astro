@@ -21,6 +21,9 @@ const {
 };
 
 const pageTitle = title ? `${title} | ${site.name}` : site.name;
+
+// Theme initialization: run in <head> to prevent flash of incorrect theme.
+// Reads saved preference, falls back to system preference, then light.
 const canonicalUrl = canonical ?? new URL(Astro.url.pathname, site.url).toString();
 const socialImage = image ?? '/favicon.svg';
 
@@ -41,6 +44,21 @@ const organizationJson = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+
+    <script
+      is:inline
+      id="theme-init"
+    >(() => {
+      const STORAGE_KEY = 'prismbyte-theme';
+      const root = document.documentElement;
+      let theme = localStorage.getItem(STORAGE_KEY);
+      if (!theme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        localStorage.setItem(STORAGE_KEY, theme);
+      }
+      root.setAttribute('data-theme', theme);
+    })();
+    </script>
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
