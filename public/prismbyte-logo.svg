@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" role="img" aria-labelledby="title">
+  <title id="title">Prismbyte</title>
+  <defs>
+    <linearGradient id="top" x1="18" y1="8" x2="108" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF65B0"/>
+      <stop offset="1" stop-color="#DF1377"/>
+    </linearGradient>
+    <linearGradient id="left" x1="20" y1="34" x2="42" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DF1377"/>
+      <stop offset="1" stop-color="#A90959"/>
+    </linearGradient>
+    <linearGradient id="right" x1="64" y1="60" x2="108" y2="109" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF3B9A"/>
+      <stop offset="1" stop-color="#C20E66"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(12 16)">
+    <path d="M20 34 64 8 108 34 108 83 64 109 64 83 86 70 86 47 64 34 42 47 42 96 20 83Z" fill="url(#top)"/>
+    <path d="M20 34 42 47 42 96 20 83Z" fill="url(#left)"/>
+    <path d="M64 83 86 70 86 47 108 34 108 83 64 109Z" fill="url(#right)"/>
+    <path d="M42 47 64 34 86 47 64 60Z" fill="#FFD1E7"/>
+    <path d="M42 47 64 60 64 83 42 96Z" fill="#C20E66"/>
+    <path d="M64 60 86 47 86 70 64 83Z" fill="#F75AA7"/>
+    <circle cx="111" cy="17" r="6" fill="#DF1377"/>
+  </g>
+  <text x="160" y="105" fill="#161614" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="750" letter-spacing="-2.6">prismbyte</text>
+</svg>
