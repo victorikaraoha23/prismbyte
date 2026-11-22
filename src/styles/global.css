@@ -21,7 +21,12 @@
   --radius-sm: 10px;
   --max-width: 1180px;
 
-  --bg-texture: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h1v1H0V0zm2 2h1v1H2V2z' fill='%23000000' fill-opacity='0.04'/%3E%3C/svg%3E");
+  /* Textures: Drafting Grid & Paper Grain */
+  --grid-color: rgba(22, 22, 20, 0.045);
+  --grid-size: 24px;
+  --noise-opacity: 0.035;
+
+  --shadow-soft: 0 18px 42px rgba(16, 24, 40, 0.08);
 }
 
 [data-theme="dark"] {
@@ -41,7 +46,12 @@
   --color-warning: #E59838;
   --color-error: #F25C6E;
 
-  --bg-texture: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h1v1H0V0zm2 2h1v1H2V2z' fill='%23ffffff' fill-opacity='0.06'/%3E%3C/svg%3E");
+  /* Textures: Drafting Grid & Paper Grain */
+  --grid-color: rgba(244, 242, 236, 0.04);
+  --grid-size: 24px;
+  --noise-opacity: 0.045;
+
+  --shadow-soft: 0 18px 42px rgba(16, 24, 40, 0.08);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -61,6 +71,11 @@
     --color-success: #34B37A;
     --color-warning: #E59838;
     --color-error: #F25C6E;
+
+    /* Textures: Drafting Grid & Paper Grain */
+    --grid-color: rgba(244, 242, 236, 0.04);
+    --grid-size: 24px;
+    --noise-opacity: 0.045;
   }
 }
 
@@ -72,10 +87,27 @@
 
 body {
   margin: 0;
-  background: var(--color-bg) var(--bg-texture);
+  background-color: var(--color-bg);
   color: var(--color-text);
   font-family: Inter, 'Segoe UI', sans-serif;
   line-height: 1.7;
+  min-height: 100vh;
+  position: relative;
+  background-image:
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  background-position: -1px -1px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--noise-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 a {
