@@ -1093,6 +1093,33 @@ main {
   text-align: center;
 }
 
+/* Keep hidden signup controls hidden despite the form's grid display rule. */
+.newsletter-popup .newsletter-form[hidden],
+.newsletter-popup .newsletter-popup__privacy[hidden] {
+  display: none;
+}
+
+.newsletter-popup .newsletter-message {
+  margin: 1rem 0 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.newsletter-popup .newsletter-message.success {
+  color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 10%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-success) 35%, var(--color-border));
+}
+
+.newsletter-popup .newsletter-message.error {
+  color: var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-error) 35%, var(--color-border));
+}
+
 .newsletter-popup .newsletter-form {
   grid-template-columns: 1fr auto;
   gap: 0.7rem;
