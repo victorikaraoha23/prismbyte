@@ -55,13 +55,9 @@
 
 <script is:inline>
 (() => {
-  const STORAGE_KEY = 'prismbyte-newsletter-dismissed';
   const SUBSCRIBED_KEY = 'prismbyte-newsletter-subscribed';
-  const SESSION_KEY = 'prismbyte-newsletter-session-shown';
-  const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
   const MIN_SHOW_DELAY = 10000;
   const SCROLL_THRESHOLD = 0.40;
-  const AUTO_CLOSE_DELAY = 1300;
 
   const popup = document.getElementById('newsletter-popup');
   const closeBtn = document.getElementById('newsletter-popup-close');
@@ -76,20 +72,7 @@
   let shown = false;
   let previouslyFocusedElement = null;
   let focusTrapListener = null;
-  let autoCloseTimer = null;
-  let pageLoadTime = Date.now();
-
-  function isDismissed() {
-    try {
-      const val = localStorage.getItem(STORAGE_KEY);
-      if (!val) return false;
-      const [ts] = val.split('|');
-      return Date.now() - parseInt(ts, 10) < SEVEN_DAYS;
-    } catch {
-      // Suppress the popup when dismissal storage is unavailable.
-      return false;
-    }
-  }
+  let dismissedThisPage = false;
 
   function isSubscribed() {
     try {
@@ -116,22 +99,6 @@
       SUBSCRIBED_KEY + '=1; Max-Age=31536000; Path=/; SameSite=Lax' + secure;
   }
 
-  function isSessionShown() {
-    try {
-      return sessionStorage.getItem(SESSION_KEY) === '1';
-    } catch {
-      return false;
-    }
-  }
-
-  function markSessionShown() {
-    try {
-      sessionStorage.setItem(SESSION_KEY, '1');
-    } catch {
-      // fail silently
-    }
-  }
-
   function setMessage(text, type) {
     message.textContent = text;
     message.className = 'newsletter-message ' + type;
@@ -149,21 +116,6 @@
     button.disabled = loading;
     input.disabled = loading;
     button.textContent = loading ? 'Subscribing...' : 'Get Practical AI Tips';
-  }
-
-  function cancelAutoClose() {
-    if (autoCloseTimer) {
-      clearTimeout(autoCloseTimer);
-      autoCloseTimer = null;
-    }
-  }
-
-  function scheduleAutoClose() {
-    cancelAutoClose();
-    autoCloseTimer = setTimeout(() => {
-      closePopup();
-      autoCloseTimer = null;
-    }, AUTO_CLOSE_DELAY);
   }
 
   function getFocusableElements() {
@@ -218,15 +170,13 @@
   }
 
   function openPopup() {
-    if (shown || isDismissed() || isSubscribed() || isSessionShown() || submitting) return false;
-    if (Date.now() - pageLoadTime < MIN_SHOW_DELAY) return false;
+    if (shown || dismissedThisPage || isSubscribed() || submitting) return false;
 
     previouslyFocusedElement = document.activeElement;
     popup.removeAttribute('hidden');
     popup.setAttribute('aria-modal', 'true');
     input.focus({ preventScroll: true });
     shown = true;
-    markSessionShown();
 
     focusTrapListener = (event) => trapFocus(event);
     document.addEventListener('keydown', focusTrapListener);
@@ -249,7 +199,6 @@
     popup.setAttribute('hidden', '');
     popup.removeAttribute('aria-modal');
     shown = false;
-    cancelAutoClose();
 
     if (focusTrapListener) {
       document.removeEventListener('keydown', focusTrapListener);
@@ -276,12 +225,13 @@
   }
 
   let timer;
-  if (!isDismissed() && !isSubscribed()) {
+  if (!isSubscribed()) {
     timer = setTimeout(maybeShowPopup, MIN_SHOW_DELAY);
     window.addEventListener('scroll', maybeShowPopup, { passive: true });
   }
 
   closeBtn.addEventListener('click', () => {
+    dismissedThisPage = true;
     closePopup();
     try {
       window.dataLayer = window.dataLayer || [];
@@ -291,11 +241,6 @@
         page_title: document.title,
         page_path: window.location.pathname,
       });
-    } catch {
-      // fail silently
-    }
-    try {
-      localStorage.setItem(STORAGE_KEY, Date.now() + '|dismissed');
     } catch {
       // fail silently
     }
@@ -326,9 +271,11 @@
       const data = await response.json().catch(() => ({}));
 
       if (response.ok) {
-        setMessage(data.message || 'You are now subscribed.', 'success');
+        setMessage('Registration successful! Your email has been added to the Prismbyte newsletter.', 'success');
         markSubscribed();
-        scheduleAutoClose();
+        form.hidden = true;
+        const privacy = popup.querySelector('.newsletter-popup__privacy');
+        if (privacy) privacy.hidden = true;
         try {
           window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({
@@ -341,9 +288,11 @@
           // fail silently
         }
       } else if (response.status === 409) {
-        setMessage("You're already subscribed! Thanks for being part of Prismbyte.", 'success');
+        setMessage('This email is already registered. You are already on the Prismbyte newsletter list.', 'success');
         markSubscribed();
-        scheduleAutoClose();
+        form.hidden = true;
+        const privacy = popup.querySelector('.newsletter-popup__privacy');
+        if (privacy) privacy.hidden = true;
       } else {
         setMessage(data.error || 'Something went wrong. Please try again later.', 'error');
       }
@@ -356,6 +305,7 @@
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !popup.hasAttribute('hidden')) {
+      dismissedThisPage = true;
       closePopup();
       try {
         window.dataLayer = window.dataLayer || [];
@@ -365,11 +315,6 @@
           page_title: document.title,
           page_path: window.location.pathname,
         });
-      } catch {
-        // fail silently
-      }
-      try {
-        localStorage.setItem(STORAGE_KEY, Date.now() + '|dismissed');
       } catch {
         // fail silently
       }
