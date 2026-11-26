@@ -93,10 +93,27 @@
 
   function isSubscribed() {
     try {
-      return localStorage.getItem(SUBSCRIBED_KEY) === '1';
+      if (localStorage.getItem(SUBSCRIBED_KEY) === '1') return true;
     } catch {
-      return false;
+      // Continue to the persistent first-party cookie fallback.
     }
+
+    return document.cookie.split(';').some((cookie) =>
+      cookie.trim() === SUBSCRIBED_KEY + '=1'
+    );
+  }
+
+  function markSubscribed() {
+    try {
+      localStorage.setItem(SUBSCRIBED_KEY, '1');
+      localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
+    } catch {
+      // The cookie below provides a second persistent storage mechanism.
+    }
+
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie =
+      SUBSCRIBED_KEY + '=1; Max-Age=31536000; Path=/; SameSite=Lax' + secure;
   }
 
   function isSessionShown() {
@@ -310,12 +327,7 @@
 
       if (response.ok) {
         setMessage(data.message || 'You are now subscribed.', 'success');
-        try {
-          localStorage.setItem(SUBSCRIBED_KEY, '1');
-          localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
-        } catch {
-          // fail silently
-        }
+        markSubscribed();
         scheduleAutoClose();
         try {
           window.dataLayer = window.dataLayer || [];
@@ -330,12 +342,7 @@
         }
       } else if (response.status === 409) {
         setMessage("You're already subscribed! Thanks for being part of Prismbyte.", 'success');
-        try {
-          localStorage.setItem(SUBSCRIBED_KEY, '1');
-          localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
-        } catch {
-          // fail silently
-        }
+        markSubscribed();
         scheduleAutoClose();
       } else {
         setMessage(data.error || 'Something went wrong. Please try again later.', 'error');
