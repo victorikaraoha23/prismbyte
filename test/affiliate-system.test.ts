@@ -332,7 +332,7 @@ describe('Newsletter signup logic', () => {
     globalThis.fetch = async (_input, init) => {
       calls++;
       assert.deepEqual(JSON.parse(init?.body as string), {
-        email, listIds: [42], updateEnabled: true,
+        email, listIds: [42], updateEnabled: false,
       });
       return new Response(null, { status: 204 });
     };
