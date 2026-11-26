@@ -67,7 +67,9 @@ async function handleNewsletter(
       body: JSON.stringify({
         email,
         listIds,
-        updateEnabled: true,
+        // Do not silently upsert: the UI needs to distinguish a new signup
+        // from an email address that is already in the contact database.
+        updateEnabled: false,
       }),
     });
 
