@@ -1,4 +1,4 @@
-﻿export interface AffiliateLink {
+export interface AffiliateLink {
   slug: string;
   name: string;
   destinationUrl: string;
@@ -13,6 +13,13 @@ export const affiliateLinks: AffiliateLink[] = [
     destinationUrl: 'https://murf.ai/?via=prismbyte',
     approved: false,
     active: false,
+  },
+  {
+    slug: 'nordvpn',
+    name: 'NordVPN',
+    destinationUrl: 'https://go.nordvpn.net/aff_c?offer_id=658&aff_id=95719',
+    approved: true,
+    active: true,
   },
   {
     slug: 'test-product',
