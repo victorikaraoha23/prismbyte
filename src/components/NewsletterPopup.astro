@@ -74,29 +74,46 @@
   let focusTrapListener = null;
   let dismissedThisPage = false;
 
+  function hasSubscriptionCookie() {
+    return document.cookie.split(';').some((part) => {
+      const separator = part.indexOf('=');
+      if (separator === -1) return false;
+      const name = part.slice(0, separator).trim();
+      const value = part.slice(separator + 1).trim();
+      return name === SUBSCRIBED_KEY && value === '1';
+    });
+  }
+
   function isSubscribed() {
     try {
-      if (localStorage.getItem(SUBSCRIBED_KEY) === '1') return true;
+      if (window.localStorage.getItem(SUBSCRIBED_KEY) === '1') return true;
     } catch {
-      // Continue to the persistent first-party cookie fallback.
+      // Continue to the cookie fallback when storage is unavailable.
     }
 
-    return document.cookie.split(';').some((cookie) =>
-      cookie.trim() === SUBSCRIBED_KEY + '=1'
-    );
+    return hasSubscriptionCookie();
   }
 
   function markSubscribed() {
-    try {
-      localStorage.setItem(SUBSCRIBED_KEY, '1');
-      localStorage.setItem(STORAGE_KEY, Date.now() + '|subscribed');
-    } catch {
-      // The cookie below provides a second persistent storage mechanism.
-    }
-
+    // Write the cookie independently so a localStorage failure cannot prevent
+    // persistence. Path=/ makes the flag available on every site page.
     const secure = window.location.protocol === 'https:' ? '; Secure' : '';
     document.cookie =
       SUBSCRIBED_KEY + '=1; Max-Age=31536000; Path=/; SameSite=Lax' + secure;
+
+    try {
+      window.localStorage.setItem(SUBSCRIBED_KEY, '1');
+    } catch {
+      // The first-party cookie remains the persistence fallback.
+    }
+
+    // Verify both mechanisms immediately. This also makes storage failures
+    // observable during debugging instead of silently assuming they worked.
+    const saved = isSubscribed();
+    if (!saved) {
+      console.error('[Prismbyte newsletter] Could not persist subscription state for this origin:', window.location.origin);
+    }
+    return saved;
   }
 
   function setMessage(text, type) {
