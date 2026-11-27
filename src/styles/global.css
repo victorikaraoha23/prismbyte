@@ -889,6 +889,18 @@ main {
   margin-bottom: 0.5rem;
 }
 
+/* Keep long source URLs inside the Sources and related-content callouts. */
+.content-callout li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.content-callout a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .empty-state {
   background: var(--color-surface);
   border: 1px dashed var(--color-border);
