@@ -98,21 +98,28 @@ describe('affiliate registry', () => {
     }
   });
 
-  test('all entries are currently unapproved', () => {
-    for (const link of affiliateLinks) {
-      assert.equal(link.approved, false);
-    }
+  test('NordVPN is the explicitly approved and active programme', () => {
+    const nordvpn = affiliateLinks.find((link) => link.slug === 'nordvpn');
+    assert.ok(nordvpn, 'NordVPN must exist in the affiliate registry');
+    assert.equal(nordvpn.approved, true);
+    assert.equal(nordvpn.active, true);
+    assert.equal(
+      nordvpn.destinationUrl,
+      'https://go.nordvpn.net/aff_c?offer_id=658&aff_id=95719',
+    );
+    assert.equal(getActiveAffiliateLink('nordvpn')?.slug, 'nordvpn');
   });
 
-  test('all entries are currently inactive', () => {
+  test('inactive or unapproved registry entries are not returned as active', () => {
     for (const link of affiliateLinks) {
-      assert.equal(link.active, false);
-    }
-  });
-
-  test('getActiveAffiliateLink returns null for all registry entries', () => {
-    for (const link of affiliateLinks) {
-      assert.equal(getActiveAffiliateLink(link.slug), undefined);
+      if (!link.approved || !link.active) {
+        assert.equal(getActiveAffiliateLink(link.slug), undefined);
+      } else {
+        assert.ok(
+          getActiveAffiliateLink(link.slug),
+          `${link.slug} is approved and active and should resolve`,
+        );
+      }
     }
   });
 });
@@ -124,7 +131,7 @@ describe('AffiliateLink worker redirect logic', () => {
     assert.ok(typeof workerModule.default.fetch === 'function');
   });
 
-  test('All /go/* requests return 404 since no programs are approved+active', async () => {
+  test('registry routes return 302 only for approved + active HTTPS programmes', async () => {
     const workerModule = await import('../src/workers/affiliate-router.ts');
     const mockEnv: any = {
       ASSETS: {
@@ -135,8 +142,37 @@ describe('AffiliateLink worker redirect logic', () => {
     for (const link of affiliateLinks) {
       const req = new Request(`https://prismbyte.site/go/${link.slug}`);
       const res = await workerModule.default.fetch(req, mockEnv);
-      assert.equal(res.status, 404);
+      const activeLink = getActiveAffiliateLink(link.slug);
+
+      if (activeLink) {
+        assert.equal(res.status, 302, `${link.slug} should redirect`);
+        assert.equal(
+          res.headers.get('Location'),
+          link.destinationUrl,
+          `${link.slug} should use its registered destination`,
+        );
+      } else {
+        assert.equal(res.status, 404, `${link.slug} should not redirect`);
+      }
     }
+  });
+
+  test('NordVPN affiliate route redirects to its approved destination', async () => {
+    const workerModule = await import('../src/workers/affiliate-router.ts');
+    const mockEnv: any = {
+      ASSETS: {
+        fetch: async (req: Request) => new Response('asset', { status: 200 }),
+      },
+    };
+    const res = await workerModule.default.fetch(
+      new Request('https://prismbyte.site/go/nordvpn'),
+      mockEnv,
+    );
+    assert.equal(res.status, 302);
+    assert.equal(
+      res.headers.get('Location'),
+      'https://go.nordvpn.net/aff_c?offer_id=658&aff_id=95719',
+    );
   });
 
   test('Unknown slug returns 404', async () => {
