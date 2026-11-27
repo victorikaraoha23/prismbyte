@@ -8,7 +8,7 @@ author: "Prismbyte Editorial Team"
 featuredImage: "https://raw.githubusercontent.com/victorikaraoha23/prismbyte/main/public/images/generated/prismbyte-using-ai-saas-on-public-wi-fi-vpn-protection-and-what-nordvpn-s--2026-11-27T22-00-02-591Z.png"
 featuredImageAlt: "Editorial image illustrating the article topic: Using AI SaaS on Public Wi-Fi: VPN Protection and What NordVPN’s Updates Mean for Small Businesses."
 imageSource: "AI-generated with Cloudflare Workers AI — FLUX.1 Schnell; stored on the production main branch"
-draft: true
+draft: false
 sources:
   - https://goldpenguin.org/blog/nordvpn-review-for-small-ai-business-owners
   - https://sonary.com/reviews/nordvpn
